@@ -1,0 +1,15 @@
+# Databases configuration
+databases:
+  # Use on a connection string
+  - type: 'mongodb'
+    plugin: '@ckenx/kenx-mongodb'
+    # Automatically connect the database during 
+    # the project deployment.
+    autoconnect: true
+    uri: '[env]:DATABASE_URL'
+
+  # Use on a connection string
+  # - type: 'redis'
+  #   plugin: '@ckenx/kenx-redis'
+  #   key: 'redis-db'
+  #   uri: '[env]:SESSION_STORE_URL'

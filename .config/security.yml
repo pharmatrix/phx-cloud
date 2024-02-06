@@ -1,0 +1,26 @@
+# Integrity & security settings
+security:
+  - type: 'firewall'
+    protocol: 'https'
+
+  # Easy way to control access for large sections of your site
+  # Note: Only the *first* access control that matches will be used
+  - type: 'access-control'
+    routing:
+      - { path: ^/admin, roles: ROLE_SUPER_USER }
+      - { path: ^/dashboard/*, roles: ROLE_USER }
+      - { path: ^/register/*, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+
+  # Activate different ways to authenticate
+  # Email address login method
+  # - type: 'auth'
+  #   method: 'email'
+  #   key: 'email-auth'
+  #   enable: false
+  
+  # Single Sign-on login method
+  # - type: 'auth'
+  #   method: 'SSO'
+  #   key: 'sso-auth'
+  #   plugin: '@oauth'
+  #   enable: true

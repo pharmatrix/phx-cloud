@@ -1,0 +1,66 @@
+# Application session configuration
+sessions:
+  # - key: 'default'
+  #   # Specify the plugin use to handle 
+  #   # application session:
+  #   # 
+  #   # NOTE:
+  #   # The support for plugin is enable by the targeted
+  #   # framework plugin itself, so others can use any stack
+  #   # and style they want to process differents aspects
+  #   # of the express application.
+  #   #
+  #   plugin: '@ckenx/kenx-fastify-session'
+  #   # Development environment
+  #   development:
+  #     # Using `in-memory` storage
+  #     type: 'in-memory'
+  #     # Session configuration/options depending assigned by application
+  #     # framework specifications.
+  #     #
+  #     # NOTE: Recommand storing these information in .env file
+  #     #       using references as follow:
+  #     #        
+  #     #       Eg. `[env]:VARIABLE_NAME`
+  #     options:
+  #       name: '[env]:APPNAME' # Refer to environment variable
+  #       secret: '[env]:SESSION_SECRET' # Refer to environment variable
+  #       saveUninitialized: true
+  #       resave: false
+  #       cookie:
+  #         httpOnly: true
+  #         secure: false
+  #         maxAge: 864000000 # Expires in a day: 24 * 3600 * 1000
+
+  #   # Production environment
+  #   production:
+  #     # Using deployed `database` store
+  #     type: 'store'
+  #     store:
+  #       # Store library provider: Use to establish
+  #       # the client connection to the store.
+  #       provider: 'redis-store'
+  #       # Set database connection configuration in `databases.yml` 
+  #       # file with a unique `key`, then provide that key here as
+  #       # a reference
+  #       database: '[databases]:redis-db'
+  #       # Extra store configuration
+  #       options:
+  #         prefix: 'session:'
+  #         ttl: 86400 # Time-To-Live when connection is inactive
+  #     # Session configuration/options depending assigned by application
+  #     # framework specifications.
+  #     #
+  #     # NOTE: Recommand storing these information in .env file
+  #     #       using references as follow:
+  #     #        
+  #     #       Eg. `[env]:VARIABLE_NAME`
+  #     options:
+  #       name: '[env]:APPNAME' # Refer to environment variable
+  #       secret: '[env]:SESSION_SECRET' # Refer to environment variable
+  #       saveUninitialized: true
+  #       resave: true
+  #       cookie:
+  #         httpOnly: true
+  #         secure: true
+  #         maxAge: 864000000 # Expires in a day: 24 * 3600 * 1000

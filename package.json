@@ -1,0 +1,23 @@
+{
+  "name": "phx-cloud",
+  "version": "1.0.0",
+  "description": "Pharmatrix Cloud Services",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "ckenx build",
+    "dev": "ckenx run --dev",
+    "start": "ckenx run --prod",
+    "start:alt": "NODE_ENV=production node autorun"
+  },
+  "dependencies": {
+    "@ckenx/kenx-fastify": "^0.0.6",
+    "@ckenx/kenx-http": "^0.0.4",
+    "@ckenx/kenx-mongodb": "^0.0.4",
+    "@ckenx/kenx-routing": "^0.0.4",
+    "@ckenx/kenx-socketio": "^0.0.6",
+    "@ckenx/node": "^0.0.12"
+  },
+  "devDependencies": {
+    "ckenx": "*"
+  }
+}

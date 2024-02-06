@@ -1,0 +1,20 @@
+# Application servers configuration
+servers:
+  # HTTP server configurations
+  - type: 'http'
+    plugin: '@ckenx/kenx-http'
+    key: 'default' # Optional value
+    HOST: '[env]:HTTP_HOST'
+    PORT: '[env]:HTTP_PORT'
+    application: '[frameworks]:fastify-app'
+  
+  # Socket.io server configurations
+  - type: 'socketio'
+    plugin: '@ckenx/kenx-socketio'
+    bindTo: 'http:default'
+    adapter: '[databases]:redis-db'
+    options:
+      cookie: false
+      allowEIO3: true
+      serveClient: true
+      connectTimeout: 15000

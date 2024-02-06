@@ -1,0 +1,28 @@
+# Enable typescript
+typescript: true
+
+# Project directory
+directory:
+  base: './src'
+  # Directory structure patterns (Optional)
+  #
+  # Default pattern: Developer have full control over the directory
+  # - `-`
+  #
+  # Defined patterns: The application auto-load this directories 
+  # - `mvc`: Model View Controller
+  pattern: '-'
+
+# Automatically injects dependencies in your services
+autowire: true
+
+# Additional configurations
+__extends__: [
+  # 'assets',
+  'servers',
+  # 'sessions',
+  'security',
+  'databases',
+  'frameworks',
+  'translations'
+]

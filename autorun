@@ -1,0 +1,42 @@
+const Kenx = require('@ckenx/node').default
+
+if( !Kenx ){
+  console.error('Kenx-node is not available')
+  process.exit(1)
+}
+
+/**
+ * Define the list of the resources configured in 
+ * `.config` to take over after kenx setup completed.
+ * 
+ * Definition symtax:
+ * 
+ * - 'http' or 'http:default': Return the only configured 
+ *    http server available
+ * 
+ * - `database:primary`: Return database client configured 
+ *    with `key: "primary"`
+ * 
+ * - `webserver:*`: Return all configured webserver servers 
+ *    as an array
+ * 
+ */
+const takeover = [
+  'http',
+  'database',
+  'socketio',
+];
+
+( async ({ autoload, dispatch }) => {
+  /**
+   * Autoload Chenx services
+   * 
+   */
+  await autoload()
+
+  /**
+   * Initialize & map setup services to project components
+   * 
+   */
+  await dispatch( takeover )
+} )( new Kenx() )

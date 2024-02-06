@@ -1,0 +1,18 @@
+# Application frameworks configuration
+frameworks:
+  - type: 'fastify'
+    plugin: '@ckenx/kenx-fastify'
+    key: 'fastify-app'
+    session: '[sessions]:default'
+    assets: '[assets]:default'
+    routing:
+      # Specify the plugin use to handle routing
+      plugin: '@ckenx/kenx-routing'
+      profile:
+        appname: '[env]:APPNAME'
+        version: '[env]:API_VERSION'
+        status: '[env]:API_STATUS'
+
+      ratelimit:
+        enable: true
+        maxRPS: 60000

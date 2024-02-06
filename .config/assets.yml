@@ -1,0 +1,35 @@
+assets:
+  # - key: 'default'
+  #   plugin: '@ckenx/kenx-fastify-assets'
+  #   # Assets storage configuration
+  #   # - cloud: connect to online space storage (CDN)
+  #   # - local: use same file system as the project
+  #   storage:
+  #     type: 'cloud'
+  #     client:
+  #       key: '[env]:STORAGE_CLIENT_KEY'
+  #       secret: '[env]:STORAGE_CLIENT_SECRET'
+  #       version: 'latest'
+  #     spaces:
+  #       - endpoint: '[env]:STORAGE_ENDPOINT'
+  #         baseURL: '[env]:STORAGE_BASE_URL'
+  #         region: '[env]:STORAGE_REGION'
+  #         bucket: '[env]:STORAGE_BUCKET'
+  
+  #   # Asset upload management configuration
+  #   # Settings change based on the used asset 
+  #   # handler plugin
+  #   upload:
+  #     maxFileSize: 1024 # The max file size in bytes
+  #     # Authorized file mime types
+  #     mimeTypes:
+  #       - 'image/*'
+  #       - 'application/octect-stream'
+
+  #   # Static assets server configuration
+  #   static:
+  #     - root: './public'
+  #       options:
+  #         prefix: '/static'
+  #         acceptRange: true
+  #         cacheControl: false
