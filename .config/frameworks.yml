@@ -2,7 +2,6 @@
 frameworks:
   - type: 'fastify'
     plugin: '@ckenx/kenx-fastify'
-    key: 'fastify-app'
     session: '[sessions]:default'
     assets: '[assets]:default'
     routing:

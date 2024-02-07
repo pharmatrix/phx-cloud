@@ -15,9 +15,14 @@
     "@ckenx/kenx-mongodb": "^0.0.4",
     "@ckenx/kenx-routing": "^0.0.4",
     "@ckenx/kenx-socketio": "^0.0.6",
-    "@ckenx/node": "^0.0.12"
+    "@ckenx/node": "^0.0.15",
+    "base-x": "3.0.8",
+    "bcryptjs": "^2.4.3",
+    "rand-token": "^1.0.1",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "ckenx": "*"
   }
 }

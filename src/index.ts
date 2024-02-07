@@ -1,16 +1,20 @@
-import Info from './routes/info'
-// import Auth from './routes/auth'
-// import User from './routes/user'
-// import Modules from './routes/modules'
-// import Sessions from './routes/sessions'
-// import Connects from './routes/connects'
-import GlobalSchemas from './gschemas'
-// import * as Purge from '../data/purge'
+import type HttpServer from '@ckenx/kenx-http'
+import type MongodbPugin from '@ckenx/kenx-mongodb'
+import type SocketIOServer from '@ckenx/kenx-socketio'
+import type { ServerPlugin } from '@ckenx/node/types/index'
 
-export default async ( http, database, io ) => {
+import Auth from '#routes/auth'
+import Utilities from '#routes/utilities'
+import GlobalSchemas from './gschemas'
+import Purge from './data/purge'
+
+export default async ( http: ServerPlugin<HttpServer>, database: MongodbPugin, io: SocketIOServer ) => {
+  if( !http.app ) 
+    throw new Error('Undefined HTTP Server')
+
   // Purge the database with static data
   const db = database.getConnection()
-  // await Purge( db )
+  await Purge( db )
 
   // Initialize applications
   http.app
@@ -22,7 +26,8 @@ export default async ( http, database, io ) => {
   .register( GlobalSchemas )
 
   // Register routes
-  .router('/', Info )
+  .router('/', Utilities )
+  .router('/auth/v1', Auth )
 
   // Handle application exception errors
   .on('error', async ( error: Error, req, res ) => {

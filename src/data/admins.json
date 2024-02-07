@@ -1,0 +1,26 @@
+[
+  {
+    "profile": {
+      "email": "admin@phx.io",
+      "firstname": "PHX",
+      "lastname": "Admin",
+      "password": "$2a$10$0RPpqZpeRgzrGRJcZd2vWu5aT0N6WyTtuVawLqpBLK6hJF/qDtflW",
+      "avatar": "https://ui-avatars.com/api/?name=S&background=000000&size=150&color=ffffff&bold=true&length=1&font-size=0.6",
+      "location": {
+        "country": "Ghana",
+        "city": "Accra"
+      }
+    },
+    "account": {
+      "role": "SU:ADMIN",
+      "PIN": "86420",
+      "notification": {
+        "push": "5FVZSoLgXIayPE4bKS9Jqq6LPkyUFeGAfJuaoIViZxQr71L9",
+        "email": true
+      }
+    },
+    "connection": {},
+    "agree_terms": true,
+    "datetime": 0
+  }
+]

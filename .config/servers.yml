@@ -3,10 +3,9 @@ servers:
   # HTTP server configurations
   - type: 'http'
     plugin: '@ckenx/kenx-http'
-    key: 'default' # Optional value
     HOST: '[env]:HTTP_HOST'
     PORT: '[env]:HTTP_PORT'
-    application: '[frameworks]:fastify-app'
+    application: '[frameworks]:default'
   
   # Socket.io server configurations
   - type: 'socketio'
