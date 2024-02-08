@@ -87,6 +87,7 @@ export default plugin( ( App: FastifyInstance, opts: RouteShorthandOptions, done
     $id: 'Device',
     type: 'object',
     properties: {
+      id: _StringType,
       os: _StringType,
       version: _StringType,
       model: _StringType,

@@ -50,6 +50,25 @@ export const getBranchId = () => {
   return 'BCH-'+ id
 }
 
+export const getDeviceId = () => {
+  const digits = String( Date.now() ).split('').reverse()
+  let
+  id = '',
+  _4g = 0
+
+  for( let x = 0; x < 4; x++ ) {
+    if( _4g == 4 ) {
+      _4g = 1
+      id = `-${id}`
+    }
+    else _4g++
+
+    id = (digits[x] || 0) + id
+  }
+
+  return 'DVC-'+ id
+}
+
 export const hashPassword = ( plain: string, hashed?: string ): Promise<string|boolean> => {
   return new Promise( ( resolve, reject ) => {
     !hashed ?

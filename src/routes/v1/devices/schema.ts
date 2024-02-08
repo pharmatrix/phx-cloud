@@ -1,32 +1,14 @@
 
 import { RouteShorthandOptions } from 'fastify'
 
-export const create: RouteShorthandOptions = {
+export const add: RouteShorthandOptions = {
   schema: {
     params: {
       type: 'object',
       properties: {
-        id: { type: 'string' }
+        id: { type: 'string' },
+        branchId: { type: 'string' }
       }
-    },
-    body: {
-      type: 'object',
-      properties: {
-        name: { type: 'string' },
-        phones: { 
-          type: 'array',
-          items: { type: 'string' },
-          minItems: 1
-        },
-        emails: { 
-          type: 'array',
-          items: { type: 'string' },
-          minItems: 1
-        },
-        location: { $ref: 'Location#' }
-      },
-      required: ['name', 'phones', 'emails', 'location'],
-      additionalProperties: false
     },
     response: {
       201: {
@@ -34,8 +16,44 @@ export const create: RouteShorthandOptions = {
         properties: {
           error: { type: 'boolean' },
           status: { type: 'string' },
-          message: { type: 'string' },
-          id: { type: 'string' }
+          id: { type: 'string' },
+          acode: { type: 'string' }
+        }
+      },
+      '4xx': { $ref: 'RequestErrorSchema#' }
+    }
+  }
+}
+
+export const activate: RouteShorthandOptions = {
+  schema: {
+    params: {
+      type: 'object',
+      properties: {
+        id: { type: 'string' },
+        branchId: { type: 'string' },
+        deviceId: { type: 'string' }
+      }
+    },
+    body: {
+      type: 'object',
+      properties: {
+        acode: { type: 'string' },
+        os: { type: 'string' },
+        model: { type: 'string' },
+        version: { type: 'string' },
+        mac: { type: 'string' }
+      },
+      required: ['acode', 'os', 'model', 'version', 'mac'],
+      additionalProperties: false
+    },
+    response: {
+      200: {
+        type: 'object',
+        properties: {
+          error: { type: 'boolean' },
+          status: { type: 'string' },
+          message: { type: 'string' }
         }
       },
       '4xx': { $ref: 'RequestErrorSchema#' }
@@ -49,7 +67,8 @@ export const retrieve: RouteShorthandOptions = {
       type: 'object',
       properties: {
         id: { type: 'string' },
-        branchId: { type: 'string' }
+        branchId: { type: 'string' },
+        deviceId: { type: 'string' }
       }
     },
     response: {
@@ -58,7 +77,7 @@ export const retrieve: RouteShorthandOptions = {
         properties: {
           error: { type: 'boolean' },
           status: { type: 'string' },
-          branch: { $ref: 'Branch#' }
+          device: { $ref: 'Device#' }
         }
       },
       '4xx': { $ref: 'RequestErrorSchema#' }
@@ -72,17 +91,16 @@ export const update: RouteShorthandOptions = {
       type: 'object',
       properties: {
         id: { type: 'string' },
-        branchId: { type: 'string' }
+        branchId: { type: 'string' },
+        deviceId: { type: 'string' }
       }
     },
     body: {
       type: 'object',
       properties: {
-        name: { type: 'string' },
-        logo: { type: 'string' },
-        contacts: { $ref: 'Contacts#' },
-        location: { $ref: 'Location#' },
-        licenseNumber: { type: 'string' }
+        os: { type: 'string' },
+        model: { type: 'string' },
+        version: { type: 'string' }
       },
       additionalProperties: false
     },
@@ -93,7 +111,7 @@ export const update: RouteShorthandOptions = {
           error: { type: 'boolean' },
           status: { type: 'string' },
           message: { type: 'string' },
-          branch: { $ref: 'Branch#' }
+          device: { $ref: 'Device#' }
         }
       },
       '4xx': { $ref: 'RequestErrorSchema#' }
@@ -106,7 +124,8 @@ export const fetch: RouteShorthandOptions = {
     params: {
       type: 'object',
       properties: {
-        id: { type: 'string' }
+        id: { type: 'string' },
+        branchId: { type: 'string' }
       }
     },
     querystring: {
@@ -124,7 +143,7 @@ export const fetch: RouteShorthandOptions = {
           status: { type: 'string' },
           results: {
             type: 'array',
-            items: { $ref: 'Branch#' }
+            items: { $ref: 'Device#' }
           }
         }
       },
@@ -138,7 +157,8 @@ export const search: RouteShorthandOptions = {
     params: {
       type: 'object',
       properties: {
-        id: { type: 'string' }
+        id: { type: 'string' },
+        branchId: { type: 'string' }
       }
     },
     querystring: {
@@ -156,7 +176,7 @@ export const search: RouteShorthandOptions = {
           status: { type: 'string' },
           results: {
             type: 'array',
-            items: { $ref: 'Branch#' }
+            items: { $ref: 'Device#' }
           }
         }
       },
@@ -171,7 +191,8 @@ export const remove: RouteShorthandOptions = {
       type: 'object',
       properties: {
         id: { type: 'string' },
-        branchId: { type: 'string' }
+        branchId: { type: 'string' },
+        deviceId: { type: 'string' }
       }
     },
     body: {
@@ -197,7 +218,8 @@ export const remove: RouteShorthandOptions = {
 }
 
 export default {
-  create,
+  add,
+  activate,
   retrieve,
   fetch,
   search,

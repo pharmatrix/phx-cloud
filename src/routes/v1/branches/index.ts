@@ -29,7 +29,6 @@ export default ( contextType: ContextType ) => {
         name,
         contacts: { phones, emails },
         location,
-        devices: [],
         created: {
           by: req.email,
           at: Now
@@ -67,7 +66,7 @@ export default ( contextType: ContextType ) => {
       limit = Number( limit ) || 50
 
       const
-      condition: any = {},
+      condition: any = { tenantId: req.tenant.id },
       { offset } = req.query as JSObject<number>
 
       // Timestamp of the last item of previous results
@@ -108,7 +107,7 @@ export default ( contextType: ContextType ) => {
       return {
         error: false,
         status: 'BRANCH::SEARCH',
-        results: await Branches.find({ $or }).sort({ 'created.at': -1 }).toArray()
+        results: await Branches.find({ tenantId: req.tenant.id, $or }).sort({ 'created.at': -1 }).toArray()
       }
     } )
 

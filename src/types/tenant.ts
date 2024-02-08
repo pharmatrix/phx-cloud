@@ -18,7 +18,10 @@ export type DeviceSession = {
   lastConnection: number
   datetime: number
 }
-export type Devices = {
+export type Device = {
+  id: string
+  tenantId: string
+  branchId: string
   os: string
   version: string
   model: string
@@ -26,10 +29,10 @@ export type Devices = {
   lastIP: string
   sessions: DeviceSession[]
   activation: {
-    code: number
+    code: string
     expiry: number
   }
-  datetime: number
+  added: ActionRecord
 }
 export type Branch = {
   id: string
@@ -37,6 +40,5 @@ export type Branch = {
   name: string
   location: Location
   contacts: Contacts
-  devices: Devices[]
   created: ActionRecord
 }
