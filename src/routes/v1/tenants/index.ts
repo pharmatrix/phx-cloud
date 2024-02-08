@@ -18,7 +18,7 @@ export default ( contextType: ContextType ) => {
     .addHook('preHandler', isConnected( App ) )
 
     // Create new tenant
-    .post('/register', { ...Schemas.register, preHandler: [ allow(['SU:', 'PU:ADMIN', 'HU:ADMIN']) ] }, async ( req, rep ) => {
+    .post('/register', { ...Schemas.register, preHandler: [ allow(['SU:', 'PU:ADMIN', 'HU:ADMIN'], contextType ) ] }, async ( req, rep ) => {
       const { name } = req.body as JSObject<any>
       if( await Tenants.findOne({ name }) )
         return rep.status(400)
@@ -132,7 +132,7 @@ export default ( contextType: ContextType ) => {
     })
 
     // Fetch tenants list
-    .get( '/', { ...Schemas.fetch, preHandler: [ allow(['SU:']) ] }, async ( req, rep ) => {
+    .get( '/', { ...Schemas.fetch, preHandler: [ allow(['SU:'], contextType ) ] }, async ( req, rep ) => {
       let { limit } = req.query as JSObject<number>
       limit = Number( limit ) || 50
 
@@ -161,7 +161,7 @@ export default ( contextType: ContextType ) => {
     } )
 
     // Search tenant
-    .get( '/search', { ...Schemas.search, preHandler: [ allow(['SU:']) ] }, async ( req, res ) => {
+    .get( '/search', { ...Schemas.search, preHandler: [ allow(['SU:'], contextType ) ] }, async ( req, res ) => {
       const
       { query, filters } = req.query as JSObject<any>,
       matcher = { $regex: String( query ).replace(/\s+/g,'|'), $options: 'i' },
@@ -184,7 +184,7 @@ export default ( contextType: ContextType ) => {
     } )
 
     // Update tenant details
-    .patch('/:id', { ...Schemas.update, preHandler: [ allow(['SU:', 'PU:ADMIN', 'HU:ADMIN']) ] }, async ( req, rep ) => {
+    .patch('/:id', { ...Schemas.update, preHandler: [ allow(['SU:', 'PU:ADMIN', 'HU:ADMIN'], contextType ) ] }, async ( req, rep ) => {
       let { id } = req.params as JSObject<any>
       // Refer to current's user context ID
       if( id === 'me' ) id = req.user.account.context.id
@@ -234,7 +234,7 @@ export default ( contextType: ContextType ) => {
     })
 
     // Retreive tenant account
-    .get('/:id', { ...Schemas.retrieve, preHandler: [ allow(['SU:', 'PU:ADMIN', 'HU:ADMIN']) ] }, async ( req, rep ) => {
+    .get('/:id', { ...Schemas.retrieve, preHandler: [ allow(['SU:', 'PU:ADMIN', 'HU:ADMIN'], contextType ) ] }, async ( req, rep ) => {
       let { id } = req.params as JSObject<any>
       // Refer to current's user context ID
       if( id === 'me' ) id = req.user.account.context.id
@@ -256,7 +256,7 @@ export default ( contextType: ContextType ) => {
     })
 
     // Delete tenant account
-    .delete('/:id', { ...Schemas.remove, preHandler: [ allow(['SU:', 'PU:ADMIN', 'HU:ADMIN']) ] }, async ( req, rep ) => {
+    .delete('/:id', { ...Schemas.remove, preHandler: [ allow(['SU:', 'PU:ADMIN', 'HU:ADMIN'], contextType ) ] }, async ( req, rep ) => {
       let { id } = req.params as JSObject<any>
       // Refer to current's user context ID
       if( id === 'me' ) id = req.user.account.context.id

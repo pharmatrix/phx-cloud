@@ -15,7 +15,7 @@ export default ( contextType: ContextType ) => {
     App
     .addHook('preHandler', isConnected( App ) )
     .addHook('preHandler', isTenant( App ) )
-    .addHook('preHandler', allow(['SU:', 'PU:ADMIN', 'HU:ADMIN']) )
+    .addHook('preHandler', allow(['SU:', 'PU:ADMIN', 'HU:ADMIN'], contextType ) )
 
     // Create new branch
     .post('/create', Schemas.create, async ( req, rep ) => {

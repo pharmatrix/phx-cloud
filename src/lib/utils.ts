@@ -1,7 +1,7 @@
 
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import type { User } from '#types/user'
-import type { JSObject } from '#types/index'
+import type { ContextType, JSObject } from '#types/index'
 import type { Tenant, TenantType } from '#types/tenant'
 
 import * as bcrypt from 'bcryptjs'
@@ -133,7 +133,7 @@ export const isTenant = ( App: FastifyInstance ) => {
   }
 }
 
-export const allow = ( roles: string[] ) => {
+export const allow = ( roles: string[], contextType?: ContextType ) => {
   return async ( req: FastifyRequest, rep: FastifyReply ) => {
     if( !req.user )
       return rep.code(401)
@@ -144,26 +144,34 @@ export const allow = ( roles: string[] ) => {
                   next: 'signin'
                 })
 
+    const errmess = {
+      error: true,
+      status: 'USER::UNAUTHRORIZED',
+      message: 'Access Denied'
+    }
+    
     if( !roles.includes( req.user.account.context.role )
         && !roles.includes( req.user.account.context.role.substring(0, 3) ) )
-      return rep.status(401)
-                .send({
-                  error: true,
-                  status: 'USER::UNAUTHRORIZED',
-                  message: 'Not Authorized Access'
-                })
+      return rep.status(401).send( errmess )
 
-    // Check whether this user is allowed opearate on the tenant
+    // Prevent other context from using super endpoints
+    if( contextType === 'super' && !/^SU\:/i.test( req.user.account.context.role ) )
+      return rep.status(401).send( errmess )
+
+    // Prevent any other context beside `super` and `pharmacy` from using `pharmacy` endpoints
+    if( contextType === 'pharmacy' && !/^[S,P]U\:/i.test( req.user.account.context.role ) )
+      return rep.status(401).send( errmess )
+
+    // Prevent any other context beside `super` and `hospital` from using `hospital` endpoints
+    if( contextType === 'hospital' && !/^[S,H]U\:/i.test( req.user.account.context.role ) )
+      return rep.status(401).send( errmess )
+
+    // Check whether this user is allowed to operate on the tenant
     const { id } = req.params as JSObject<string>
     if( id
         && !/^SU\:/i.test( req.user.account.context.role )
         && id !== 'me'
         && req.user.account.context.id !== id )
-      return rep.status(401)
-                .send({
-                  error: true,
-                  status: 'TENANT::UNAUTHORIZED',
-                  message: 'Access Denied'
-                })
+      return rep.status(401).send( errmess )
   }
 }
