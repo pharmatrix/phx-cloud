@@ -49,7 +49,8 @@ export default plugin( ( App: FastifyInstance, opts: RouteShorthandOptions, done
     type: 'object',
     properties: {
       country: _StringType,
-      city: _StringType
+      city: _StringType,
+      address: _StringType
     },
     required: ['country', 'city'],
     additionalProperties: false
@@ -68,6 +69,38 @@ export default plugin( ( App: FastifyInstance, opts: RouteShorthandOptions, done
         items: { type: 'string' },
         minItems: 1
       },
+    },
+    additionalProperties: false
+  })
+  .addSchema({
+    $id: 'DeviceSession',
+    type: 'object',
+    properties: {
+      name: _StringType,
+      avatar: _StringType,
+      lastConnection: _NumberType,
+      datetime: _NumberType
+    },
+    additionalProperties: false
+  })
+  .addSchema({
+    $id: 'Device',
+    type: 'object',
+    properties: {
+      os: _StringType,
+      version: _StringType,
+      model: _StringType,
+      mac: _StringType,
+      lastIP: _StringType,
+      sessions: {
+        type: 'array',
+        items: { $ref: 'DeviceSession#' }
+      },
+      activation: {
+        code: _NumberType,
+        expiry: _NumberType
+      },
+      datetime: _NumberType
     },
     additionalProperties: false
   })
@@ -170,6 +203,26 @@ export default plugin( ( App: FastifyInstance, opts: RouteShorthandOptions, done
       registered: ActionRecord
     },
     required: ['type', 'id', 'name', 'logo', 'licenseNumber', 'contacts', 'location', 'registered'],
+    additionalProperties: false
+  })
+
+  // Branch data validation schema reference
+  .addSchema({
+    $id: 'Branch',
+    type: 'object',
+    properties: {
+      id: _StringType,
+      tenantId: _StringType,
+      name: _StringType,
+      contacts: { $ref: 'Contacts#' },
+      location: { $ref: 'Location#' },
+      devices: {
+        type: 'array',
+        items: { $ref: 'Device#' }
+      },
+      created: ActionRecord
+    },
+    required: ['id', 'tenantId', 'name', 'contacts', 'location', 'devices', 'created'],
     additionalProperties: false
   })
   

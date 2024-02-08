@@ -2,7 +2,7 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import type { User } from '#types/user'
 import type { JSObject } from '#types/index'
-import type { TenantType } from '#types/tenant'
+import type { Tenant, TenantType } from '#types/tenant'
 
 import * as bcrypt from 'bcryptjs'
 import Encoder from '#lib/Encoder'
@@ -29,6 +29,25 @@ export const getTenantId = ( type: TenantType ) => {
   }
 
   return (type === 'pharmacy' ? 'PH' : 'HP')+ id
+}
+
+export const getBranchId = () => {
+  const digits = String( Date.now() ).split('').reverse()
+  let
+  id = '',
+  _4g = 0
+
+  for( let x = 0; x < 4; x++ ) {
+    if( _4g == 4 ) {
+      _4g = 1
+      id = `-${id}`
+    }
+    else _4g++
+
+    id = (digits[x] || 0) + id
+  }
+
+  return 'BCH-'+ id
 }
 
 export const hashPassword = ( plain: string, hashed?: string ): Promise<string|boolean> => {
@@ -92,6 +111,25 @@ export const isConnected = ( App: FastifyInstance ) => {
 
     req.user = user
     req.email = user.profile.email
+  }
+}
+
+export const isTenant = ( App: FastifyInstance ) => {
+  return async ( req: FastifyRequest, rep: FastifyReply ) => {
+    let { id } = req.params as JSObject<any>
+    // Refer to current's user context ID
+    if( !id || id === 'me' ) id = req.user.account.context.id
+
+    const tenant = await App.db.collection('tenants').findOne({ id }) as Tenant | null
+    if( !tenant )
+      return rep.status(401)
+                .send({
+                  error: true,
+                  status: 'TENANT::UNAUTHRORIZED',
+                  message: 'Not Authorized Access'
+                })
+    
+    req.tenant = tenant
   }
 }
 

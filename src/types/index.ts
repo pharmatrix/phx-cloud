@@ -10,6 +10,10 @@ export type Location = {
   city?: string
   address?: string
 }
+export type Contacts = {
+  phones: string[]
+  emails: string[]
+}
 
 export type ContextType = 'super' | 'pharmacy' | 'hospital'
 export type Context = {

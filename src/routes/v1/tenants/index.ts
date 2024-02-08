@@ -11,7 +11,8 @@ export default ( contextType: ContextType ) => {
     const
     Logs = App.db.collection('logs') as Collection,
     Users = App.db.collection('users') as Collection,
-    Tenants = App.db.collection('tenants') as Collection
+    Tenants = App.db.collection('tenants') as Collection,
+    Branches = App.db.collection('branches') as Collection
 
     App
     .addHook('preHandler', isConnected( App ) )
@@ -130,7 +131,7 @@ export default ( contextType: ContextType ) => {
           })
     })
 
-    // Fetch courses list
+    // Fetch tenants list
     .get( '/', { ...Schemas.fetch, preHandler: [ allow(['SU:']) ] }, async ( req, rep ) => {
       let { limit } = req.query as JSObject<number>
       limit = Number( limit ) || 50
@@ -178,7 +179,7 @@ export default ( contextType: ContextType ) => {
       return {
         error: false,
         status: 'TENANT::SEARCH',
-        results: await Tenants.find({ $or }).sort({ 'registerd.at': -1 }).toArray()
+        results: await Tenants.find({ $or }).sort({ 'registered.at': -1 }).toArray()
       }
     } )
 
@@ -219,7 +220,7 @@ export default ( contextType: ContextType ) => {
         action: 'UPDATE-TENANT',
         uid: req.email,
         context: req.user.account.context,
-        data: { updates },
+        data: { id, updates },
         datetime: Date.now()
       }
       await Logs.insertOne( alog )
@@ -269,15 +270,20 @@ export default ( contextType: ContextType ) => {
                     message: `Tenant Not Found`
                   })
 
+      // Delete all branches attached to this tenant account
+      await Branches.deleteMany({ tenantId: id })
+      // Detach all users attached to this tenant account
+      await Users.updateMany({ 'account.context.id': id }, { $set: { 'account.context': {} } })
+
       /* -----------------------------------------------------------------------------------------------*/
       // New invitation log
       const 
       { reason } = req.body as JSObject<string>,
       alog: ActivityLog = {
-        action: 'UPDATE-TENANT',
+        action: 'DELETE-TENANT',
         uid: req.email,
         context: req.user.account.context,
-        data: { reason },
+        data: { id, reason },
         datetime: Date.now()
       }
       await Logs.insertOne( alog )

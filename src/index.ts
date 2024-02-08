@@ -5,6 +5,7 @@ import type { ServerPlugin } from '@ckenx/node/types/index'
 
 import Auth_v1 from '#routes/v1/auth'
 import Tenants_v1 from '#routes/v1/tenants'
+import Branches_v1 from '#routes/v1/branches'
 import Security_v1 from '#routes/v1/security'
 import Utilities_v1 from '#routes/v1/utilities'
 import Invitations_v1 from '#routes/v1/invitations'
@@ -40,6 +41,10 @@ export default async ( http: ServerPlugin<HttpServer>, database: MongodbPugin, i
   .router('/super/v1/tenants', Tenants_v1('super') )
   .router('/pharmacy/v1/tenants', Tenants_v1('pharmacy') )
   .router('/hospital/v1/tenants', Tenants_v1('hospital') )
+
+  .router('/super/v1/tenants/:id/branches', Branches_v1('super') )
+  .router('/pharmacy/v1/tenants/:id/branches', Branches_v1('pharmacy') )
+  .router('/hospital/v1/tenants/:id/branches', Branches_v1('hospital') )
 
   // Handle application exception errors
   .on('error', async ( error: Error, req, res ) => {

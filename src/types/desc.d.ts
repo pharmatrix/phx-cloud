@@ -1,5 +1,6 @@
 import type { Db } from 'mongodb'
 import type { User } from './user'
+import type { Tenant } from './tenant'
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -8,6 +9,7 @@ declare module 'fastify' {
   }
   interface FastifyRequest {
     user: User
+    tenant: Tenant
     email: string
   }
 }
