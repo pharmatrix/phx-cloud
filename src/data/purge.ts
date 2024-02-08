@@ -6,7 +6,7 @@ const rootUID = 'admin@phx.io'
 export default async ( db: Db ) => {
   const DBUsers = db.collection('users')
   // Make sure to only purge once.
-  if( await DBUsers.findOne({ 'profile.email': rootUID, 'account.role': 'SU:ADMIN' }) ) return
+  if( await DBUsers.findOne({ 'profile.email': rootUID, 'account.context.type': 'super', 'account.context.role': 'SU:ADMIN' }) ) return
 
   // Add initial Super Admin users
   try { await DBUsers.insertMany( Admins ) }

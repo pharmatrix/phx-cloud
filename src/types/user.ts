@@ -1,8 +1,6 @@
+import { Location, Context } from '.'
+
 export type UserRole = /* Super User */ 'SU:ADMIN' | 'SU:MANAGER' | 'SU:SUPPORT' | 'SU:DEVELOPER' | /* Pharmacy User */ 'PU:ADMIN' | 'PU:MANAGER' | 'PU:OPERATOR' | 'PU:SUPPORT' | 'PU:DEVELOPER' | /* Hospital User */ 'HU:ADMIN' | 'HU:PRACTICIAN'
-export type UserLocation = {
-  country?: string
-  city?: string
-}
 export type UserProfile = {
   firstname: string
   lastname: string
@@ -11,11 +9,11 @@ export type UserProfile = {
   dob?: string
   gender?: string
   avatar: string
-  location?: UserLocation
+  location?: Location
 }
 export type UserAccount = {
   PIN: string
-  role: UserRole
+  context: Context
   notification: {
     push?: string
     email: boolean
@@ -31,6 +29,10 @@ export type UserConnection = {
       sentAt: number
       delay: number
     }
+  }
+  restricted?: {
+    action: 'COMPLETE-SIGNUP'
+    message: string
   }
   resetPwd?: {
     vtoken: string

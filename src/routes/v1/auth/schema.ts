@@ -11,11 +11,42 @@ export const signup: RouteShorthandOptions = {
         role: { type: 'string' },
         email: { type: 'string' },
         password: { type: 'string' },
-        location: { $ref: 'UserLocation#' },
+        location: { $ref: 'Location#' },
         device: { $ref: 'UserDevice#' },
         agree_terms: { type: 'boolean' },
       },
-      required: ['firstname', 'lastname', 'role', 'email', 'password', 'location', 'agree_terms'],
+      required: ['firstname', 'lastname', 'role', 'email', 'password', 'location', 'device', 'agree_terms'],
+      additionalProperties: false
+    },
+    response: {
+      201: {
+        type: 'object',
+        properties: {
+          error: { type: 'boolean' },
+          status: { type: 'string' },
+          message: { type: 'string' },
+          next: { type: 'string' }
+        }
+      },
+      '4xx': { $ref: 'RequestErrorSchema#' }
+    }
+  }
+}
+
+export const completeSignup: RouteShorthandOptions = {
+  schema: {
+    body: {
+      type: 'object',
+      properties: {
+        firstname: { type: 'string' },
+        lastname: { type: 'string' },
+        email: { type: 'string' },
+        password: { type: 'string' },
+        location: { $ref: 'Location#' },
+        device: { $ref: 'UserDevice#' },
+        agree_terms: { type: 'boolean' },
+      },
+      required: ['firstname', 'lastname', 'email', 'password', 'location', 'device', 'agree_terms'],
       additionalProperties: false
     },
     response: {
@@ -157,6 +188,7 @@ export const resendEmail: RouteShorthandOptions = {
 
 export default {
   signup,
+  completeSignup,
   signin,
   verify,
   resendEmail,

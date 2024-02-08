@@ -8,6 +8,6 @@ declare module 'fastify' {
   }
   interface FastifyRequest {
     user: User
-    condition: any
+    email: string
   }
 }

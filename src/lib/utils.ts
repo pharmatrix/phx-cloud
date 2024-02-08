@@ -69,6 +69,6 @@ export const isConnected = ( App: FastifyInstance ) => {
                 })
 
     req.user = user
-    req.condition = { 'profile.email': user.profile.email }
+    req.email = user.profile.email
   }
 }

@@ -30,7 +30,8 @@ export default plugin( ( App: FastifyInstance, opts: RouteShorthandOptions, done
     properties: {
       error: _BooleanType,
       status: _StringType,
-      message: _StringType
+      message: _StringType,
+      next: _StringType
     }
   })
   .addSchema({
@@ -43,9 +44,20 @@ export default plugin( ( App: FastifyInstance, opts: RouteShorthandOptions, done
     items: { type: 'string' }
   })
 
-  // User validation schema reference
+  // User validation schema references
   .addSchema({
-    $id: 'UserLocation',
+    $id: 'UserContext',
+    type: 'object',
+    properties: {
+      type: _StringType,
+      role: _StringType,
+      id: _StringType,
+    },
+    required: ['type', 'role'],
+    additionalProperties: false
+  })
+  .addSchema({
+    $id: 'Location',
     type: 'object',
     properties: {
       country: _StringType,
@@ -76,7 +88,7 @@ export default plugin( ( App: FastifyInstance, opts: RouteShorthandOptions, done
       dob: _StringType,
       gender: _StringType,
       avatar: _StringType,
-      location: { $ref: 'UserLocation#' }
+      location: { $ref: 'Location#' }
     },
     required: ['firstname', 'lastname', 'email', 'avatar', 'location'],
     additionalProperties: false
@@ -85,7 +97,7 @@ export default plugin( ( App: FastifyInstance, opts: RouteShorthandOptions, done
     $id: 'UserAccount',
     type: 'object',
     properties: {
-      role: _StringType,
+      context: { $ref: 'UserContext#' },
       PIN: _StringType,
       notification: {
         type: 'object',
@@ -95,7 +107,8 @@ export default plugin( ( App: FastifyInstance, opts: RouteShorthandOptions, done
         },
         additionalProperties: false
       }
-    }
+    },
+    required: ['context', 'notification'],
   })
   .addSchema({
     $id: 'User',
@@ -109,6 +122,20 @@ export default plugin( ( App: FastifyInstance, opts: RouteShorthandOptions, done
     additionalProperties: false
   })
 
+  // User invitation validation schema reference
+  .addSchema({
+    $id: 'Invitation',
+    type: 'object',
+    properties: {
+      context: { $ref: 'UserContext#' },
+      name: _StringType,
+      email: _StringType,
+      expiry: _NumberType,
+      added: ActionRecord
+    },
+    required: ['context', 'email', 'expiry', 'added'],
+    additionalProperties: false
+  })
   
   done()
 } )

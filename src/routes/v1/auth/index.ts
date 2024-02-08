@@ -1,11 +1,11 @@
 import type { FastifyInstance } from 'fastify'
 import type { Collection } from 'mongodb'
 import type { User } from '#types/user'
-import type { ActivityLog, JSObject } from '#types/index'
+import type { ActivityLog, Context, JSObject } from '#types/index'
 
-import Schemas from './schema'
 import * as rtoken from 'rand-token'
 import Encoder from '#lib/Encoder'
+import Schemas from './schema'
 import { getImageSource, hashPassword, isConnected, isValidEmail, random  } from '#lib/utils'
 
 export default async ( App: FastifyInstance ) => {
@@ -15,15 +15,17 @@ export default async ( App: FastifyInstance ) => {
 
   App
   // Signup
-  .post('/signup', Schemas.signup, async ( req, rep ) => {
-    // Check for existing user
+  .post('/:contextType/signup', Schemas.signup, async ( req, rep ) => {
     let { email } = req.body as JSObject<any>
+
+    // Normalize email address
+    email = email.trim().toLowerCase()
     if( !isValidEmail( email ) )
       return rep.code(400)
                 .send({
                   error: true,
                   status: 'AUTH::INVALID_REQUEST',
-                  message: 'Invalid Email Address'
+                  message: 'Invalid email address'
                 })
 
     const exists = await Users.findOne({ 'profile.email': email }) as unknown as User | null
@@ -35,18 +37,20 @@ export default async ( App: FastifyInstance ) => {
                   message: 'User already exists'
                 })
 
-    // Normalize email address
-    email = email.trim().toLowerCase()
-    if( !email )
+    const
+    { role } = req.body as JSObject<any>,
+    { contextType } = req.params as JSObject<any>
+    if( !['pharmacy', 'hospital'].includes( contextType ) )
       return rep.code(400)
                 .send({
                   error: true,
                   status: 'AUTH::INVALID_REQUEST',
-                  message: 'Invalid email address'
+                  message: 'Invalid Sign-up context'
                 })
 
-    const { role } = req.body as JSObject<any>
-    if( !['PU:ADMIN'].includes( role ) )
+    if( !['PU:ADMIN', 'HU:ADMIN'].includes( role )
+        || ( contextType == 'pharmacy' && role !== 'PU:ADMIN' ) 
+        || ( contextType == 'hospital' && role !== 'HU:ADMIN' ) )
       return rep.code(400)
                 .send({
                   error: true,
@@ -66,6 +70,10 @@ export default async ( App: FastifyInstance ) => {
     const
     { firstname, lastname, agree_terms, location, device } = req.body as JSObject<any>,
     Now = Date.now(),
+    context: Context = {
+      type: contextType,
+      role
+    },
     user: User = {
       profile: {
         email,
@@ -76,7 +84,7 @@ export default async ( App: FastifyInstance ) => {
         location
       },
       account: {
-        role,
+        context,
         PIN: String( random(1000, 9999) ), // Default PIN
         notification: {
           push: rtoken.generate(48) as string, // Push notification token
@@ -100,7 +108,7 @@ export default async ( App: FastifyInstance ) => {
     const alog: ActivityLog = {
       action: 'SIGNUP',
       uid: email,
-      role,
+      context,
       data: { location, device },
       datetime: Now
     }
@@ -139,6 +147,98 @@ export default async ( App: FastifyInstance ) => {
     // Send vCode out during development mode for Postman Automated Test
     rep.code(201).send( process.env.NODE_ENV == 'development' ? { ...response, code: user.connection.verification?.code } : response )
   })
+  // Complete signup process
+  .patch('/complete-signup', Schemas.completeSignup, async ( req, rep ) => {
+    let { email } = req.body as JSObject<any>
+
+    // Normalize email address
+    email = email.trim().toLowerCase()
+    if( !isValidEmail( email ) )
+      return rep.code(400)
+                .send({
+                  error: true,
+                  status: 'AUTH::INVALID_REQUEST',
+                  message: 'Invalid email address'
+                })
+
+    const user = await Users.findOne({ 'profile.email': email }) as unknown as User | null
+    if( !user )
+      return rep.code(400)
+                .send({
+                  error: true,
+                  status: 'AUTH::NOT_FOUND',
+                  message: 'User Account Not Found',
+                  next: 'signup'
+                })
+
+    const { password } = req.body as JSObject<any>
+    if( !password )
+      return rep.code(400)
+                .send({
+                  error: true,
+                  status: 'AUTH::INVALID_REQUEST',
+                  message: 'Invalid Password'
+                })
+    
+    const
+    { firstname, lastname, agree_terms, location, device } = req.body as JSObject<any>,
+    Now = Date.now(),
+    toSet = {
+      'profile': {
+        email,
+        firstname,
+        lastname,
+        password: await hashPassword( password ) as string,
+        avatar: getImageSource( firstname ),
+        location
+      },
+      'connection': {},
+      agree_terms,
+      datetime: Now
+    }
+
+    await Users.updateOne({ 'profile.email': email }, { $set: toSet })
+
+    /* -----------------------------------------------------------------------------------------------*/
+    // New sign-up log
+    const alog: ActivityLog = {
+      action: 'COMPLETE-SIGNUP',
+      uid: email,
+      context: user.account.context,
+      data: { location, device },
+      datetime: Now
+    }
+    await Logs.insertOne( alog )
+
+    /* -----------------------------------------------------------------------------------------------*/
+    // Send verification code by email
+    try {
+      // NOTE: Do not await for response
+      // req.bnd.send.email({
+      //   sender: 'General-Email-Sender',
+      //   express: true,
+      //   priority: 'high',
+      //   template: 'Verification Code',
+      //   subject: 'Email Address Verification Code',
+      //   recipient: { name: getName( req.body ), address: email },
+      //   scope: {
+      //     name: data.profile.first_name,
+      //     tenant: !isTenant( req ) ? process.env.APPNAME : req.tenant.name,
+      //     refURL: `${process.env.SUPPORT_PAGE_URL}/auth/verify/code`,
+      //     vCode
+      //   }
+      // })
+    }
+    catch( error ) { console.log( 'SEND_EMAIL::FAILED >> ', error ) }
+    
+    return {
+      error: false,
+      status: 'AUTH::SIGNUP',
+      message: 'User account completed',
+      next: 'signin'
+    }
+  })
+
   // Signin the user
   .post('/signin', Schemas.signin, async ( req, rep ) => {
     const { email }: any = req.body
@@ -169,12 +269,22 @@ export default async ( App: FastifyInstance ) => {
                   next: 'signup'
                 })
 
+    // Check whether user account is restricted for some reason
+    if( user.connection.restricted )
+      return rep.code(401)
+                .send({
+                  error: true,
+                  status: 'AUTH::INVALID_REQUEST',
+                  message: `User Account Restricted: ${user.connection.restricted.message}`,
+                  next: 'verify'
+                })
+
     // Check whether user email address is verified
     if( user.connection.verification )
       return rep.code(401)
                 .send({
                   error: true,
-                  status: 'AUTH::USER_NOT_FOUND',
+                  status: 'AUTH::INVALID_REQUEST',
                   message: 'User Account Verification Required',
                   next: 'verify'
                 })
@@ -201,7 +311,7 @@ export default async ( App: FastifyInstance ) => {
     alog: ActivityLog = {
       action: 'SIGNIN',
       uid: email,
-      role: user.account.role,
+      context: user.account.context,
       data: { location, device },
       datetime: Date.now()
     }
@@ -276,7 +386,7 @@ export default async ( App: FastifyInstance ) => {
     const alog: ActivityLog = {
       action: 'SIGNOUT',
       uid: email,
-      role: user.account.role,
+      context: user.account.context,
       data: {},
       datetime: Date.now()
     }
@@ -322,7 +432,7 @@ export default async ( App: FastifyInstance ) => {
       const alog: ActivityLog = {
         action: 'RESET-PASSWORD',
         uid: email,
-        role: user.account.role,
+        context: user.account.context,
         data: { vtoken },
         datetime: Date.now()
       }
@@ -406,7 +516,7 @@ export default async ( App: FastifyInstance ) => {
     const alog: ActivityLog = {
       action: 'RESET-PASSWORD-REQUEST',
       uid: email,
-      role: user.account.role,
+      context: user.account.context,
       data: { vtoken },
       datetime: Date.now()
     }

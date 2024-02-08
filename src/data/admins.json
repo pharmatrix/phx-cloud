@@ -12,7 +12,10 @@
       }
     },
     "account": {
-      "role": "SU:ADMIN",
+      "context": {
+        "type": "super",
+        "role": "SU:ADMIN"
+      },
       "PIN": "86420",
       "notification": {
         "push": "5FVZSoLgXIayPE4bKS9Jqq6LPkyUFeGAfJuaoIViZxQr71L9",

@@ -3,9 +3,11 @@ import type MongodbPugin from '@ckenx/kenx-mongodb'
 import type SocketIOServer from '@ckenx/kenx-socketio'
 import type { ServerPlugin } from '@ckenx/node/types/index'
 
-import Auth from '#routes/auth'
-import Utilities from '#routes/utilities'
-import GlobalSchemas from './gschemas'
+import Auth_v1 from '#routes/v1/auth'
+import Security_v1 from '#routes/v1/security'
+import Utilities_v1 from '#routes/v1/utilities'
+import Invitations_v1 from '#routes/v1/invitations'
+import GlobalSchemas_v1 from './routes/v1/gschemas'
 import Purge from './data/purge'
 
 export default async ( http: ServerPlugin<HttpServer>, database: MongodbPugin, io: SocketIOServer ) => {
@@ -23,11 +25,15 @@ export default async ( http: ServerPlugin<HttpServer>, database: MongodbPugin, i
   // Socket.io server
   .attach('io', io )
   // Global schema validation references
-  .register( GlobalSchemas )
+  .register( GlobalSchemas_v1 )
 
   // Register routes
-  .router('/', Utilities )
-  .router('/auth/v1', Auth )
+  .router('/', Utilities_v1 )
+  .router('/auth/v1', Auth_v1 )
+  .router('/security/v1', Security_v1 )
+  .router('/super/v1/invitations', Invitations_v1('super') )
+  .router('/pharmacy/v1/invitations', Invitations_v1('pharmacy') )
+  .router('/hospital/v1/invitations', Invitations_v1('hospital') )
 
   // Handle application exception errors
   .on('error', async ( error: Error, req, res ) => {
