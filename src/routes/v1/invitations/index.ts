@@ -1,8 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 import type { Collection } from 'mongodb'
 import type { User } from '#types/user'
-import type { Pharmacy } from '#types/pharmacy'
-import type { Hospital } from '#types/hospital'
+import type { Tenant } from '#types/tenant'
 import type { ActivityLog, Context, ContextType, Invitation, JSObject } from '#types/index'
 
 import * as rtoken from 'rand-token'
@@ -15,8 +14,7 @@ export default ( contextType: ContextType ) => {
     const
     Logs = App.db.collection('logs') as Collection,
     Users = App.db.collection('users') as Collection,
-    Hospitals = App.db.collection('hospitals') as Collection,
-    Pharmacies = App.db.collection('pharmacies') as Collection,
+    Tenants = App.db.collection('tenants') as Collection,
     Invitations = App.db.collection('invitations') as Collection
 
     App
@@ -56,7 +54,7 @@ export default ( contextType: ContextType ) => {
       let context: Context = { type: contextType, role }
       switch( contextType ){
         case 'pharmacy': {
-          const pharmacy = await Pharmacies.findOne({ id: cid }) as Pharmacy | null
+          const pharmacy = await Tenants.findOne({ type: 'pharmacy', id: cid }) as Tenant | null
           if( !pharmacy )
             return rep.code(401)
                       .send({
@@ -87,7 +85,7 @@ export default ( contextType: ContextType ) => {
         } break
 
         case 'hospital': {
-          const hospital = await Hospitals.findOne({ id: cid }) as Hospital | null
+          const hospital = await Tenants.findOne({ type: 'hospital', id: cid }) as Tenant | null
           if( !hospital )
             return rep.code(401)
                       .send({

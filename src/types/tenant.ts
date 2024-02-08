@@ -1,6 +1,8 @@
-import { ActionRecord } from '.'
+import { ActionRecord, Location } from '.'
 
-export type Pharmacy = {
+export type TenantType = 'pharmacy' | 'hospital'
+export type Tenant = {
+  type: TenantType
   id: string
   name: string
   logo: string
@@ -8,19 +10,15 @@ export type Pharmacy = {
     phones: string[]
     emails: string[]
   }
-  licenceNumber: string
-  created: ActionRecord
-  updated?: ActionRecord
+  location: Location
+  licenseNumber: string
+  registered: ActionRecord
 }
 
 export type Branch = {
-  pharmacyId: string
+  tenantId: string
   name: string
-  location: {
-    country: string
-    city: string
-    address: string
-  }
+  location: Location
   contacts: {
     phones: string[]
     emails: string[]

@@ -44,6 +44,34 @@ export default plugin( ( App: FastifyInstance, opts: RouteShorthandOptions, done
     items: { type: 'string' }
   })
 
+  .addSchema({
+    $id: 'Location',
+    type: 'object',
+    properties: {
+      country: _StringType,
+      city: _StringType
+    },
+    required: ['country', 'city'],
+    additionalProperties: false
+  })
+  .addSchema({
+    $id: 'Contacts',
+    type: 'object',
+    properties: {
+      phones: { 
+        type: 'array',
+        items: { type: 'string' },
+        minItems: 1
+      },
+      emails: { 
+        type: 'array',
+        items: { type: 'string' },
+        minItems: 1
+      },
+    },
+    additionalProperties: false
+  })
+
   // User validation schema references
   .addSchema({
     $id: 'UserContext',
@@ -54,16 +82,6 @@ export default plugin( ( App: FastifyInstance, opts: RouteShorthandOptions, done
       id: _StringType,
     },
     required: ['type', 'role'],
-    additionalProperties: false
-  })
-  .addSchema({
-    $id: 'Location',
-    type: 'object',
-    properties: {
-      country: _StringType,
-      city: _StringType
-    },
-    required: ['country', 'city'],
     additionalProperties: false
   })
   .addSchema({
@@ -134,6 +152,24 @@ export default plugin( ( App: FastifyInstance, opts: RouteShorthandOptions, done
       added: ActionRecord
     },
     required: ['context', 'email', 'expiry', 'added'],
+    additionalProperties: false
+  })
+
+  // Tenant data validation schema reference
+  .addSchema({
+    $id: 'Tenant',
+    type: 'object',
+    properties: {
+      type: _StringType,
+      id: _StringType,
+      name: _StringType,
+      logo: _StringType,
+      licenseNumber: _StringType,
+      contacts: { $ref: 'Contacts#' },
+      location: { $ref: 'Location#' },
+      registered: ActionRecord
+    },
+    required: ['type', 'id', 'name', 'logo', 'licenseNumber', 'contacts', 'location', 'registered'],
     additionalProperties: false
   })
   

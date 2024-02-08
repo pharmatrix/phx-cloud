@@ -8,6 +8,7 @@ export type ActionRecord = {
 export type Location = {
   country?: string
   city?: string
+  address?: string
 }
 
 export type ContextType = 'super' | 'pharmacy' | 'hospital'

@@ -4,6 +4,7 @@ import type SocketIOServer from '@ckenx/kenx-socketio'
 import type { ServerPlugin } from '@ckenx/node/types/index'
 
 import Auth_v1 from '#routes/v1/auth'
+import Tenants_v1 from '#routes/v1/tenants'
 import Security_v1 from '#routes/v1/security'
 import Utilities_v1 from '#routes/v1/utilities'
 import Invitations_v1 from '#routes/v1/invitations'
@@ -31,9 +32,14 @@ export default async ( http: ServerPlugin<HttpServer>, database: MongodbPugin, i
   .router('/', Utilities_v1 )
   .router('/auth/v1', Auth_v1 )
   .router('/security/v1', Security_v1 )
+
   .router('/super/v1/invitations', Invitations_v1('super') )
   .router('/pharmacy/v1/invitations', Invitations_v1('pharmacy') )
   .router('/hospital/v1/invitations', Invitations_v1('hospital') )
+
+  .router('/super/v1/tenants', Tenants_v1('super') )
+  .router('/pharmacy/v1/tenants', Tenants_v1('pharmacy') )
+  .router('/hospital/v1/tenants', Tenants_v1('hospital') )
 
   // Handle application exception errors
   .on('error', async ( error: Error, req, res ) => {
