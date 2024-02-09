@@ -4,7 +4,7 @@ import type { User } from '#types/user'
 import type { ActivityLog, ContextType, JSObject } from '#types/index'
 
 import Schemas from './schema'
-import { allow, isConnected } from '#lib/utils'
+import { allow, isConnected, isTenant } from '#lib/utils'
 
 export default ( contextType: ContextType ) => {
   return async ( App: FastifyInstance ) => {
@@ -14,27 +14,19 @@ export default ( contextType: ContextType ) => {
 
     App
     .addHook('preHandler', isConnected( App ) )
+    .addHook('preHandler', isTenant( App ) )
+    .addHook('preHandler', allow(['SU:', 'PU:ADMIN', 'PU:MAMANGER', 'HU:ADMIN'], contextType ) )
 
     // Fetch users list
-    .get('/', { ...Schemas.fetch, preHandler: [ allow(['SU:', 'PU:ADMIN', 'PU:MAMANGER', 'HU:ADMIN'], contextType ) ] }, async ( req, rep ) => {
+    .get('/', Schemas.fetch, async ( req, rep ) => {
       let { limit } = req.query as JSObject<number>
       limit = Number( limit ) || 50
 
       const condition: any = {}
       
       // Fetch users by tenant scope
-      if( ['pharmacy', 'hospital'].includes( contextType ) ){
-        const { id } = req.params as JSObject<string>
-        if( !id )
-          return rep.status(400)
-                    .send({
-                      error: true,
-                      status: 'USER::INVALID_REQUEST',
-                      message: `Undefined ${contextType} ID`
-                    })
-
-        condition['account.context.id'] = id
-      }
+      if( ['pharmacy', 'hospital'].includes( contextType ) )
+        condition['account.context.id'] = req.tenant.id
 
       // Timestamp of the last item of previous results
       const { offset } = req.query as JSObject<number>
@@ -58,7 +50,7 @@ export default ( contextType: ContextType ) => {
     })
 
     // Search a user
-    .get( '/search', { ...Schemas.search, preHandler: [ allow(['SU:', 'PU:ADMIN', 'PU:MAMANGER', 'HU:ADMIN'], contextType ) ] }, async ( req, rep ) => {
+    .get( '/search', Schemas.search, async ( req, rep ) => {
       const
       { query, filters } = req.query as JSObject<any>,
       matcher = { $regex: String( query ).replace(/\s+/g,'|'), $options: 'i' },
@@ -78,18 +70,8 @@ export default ( contextType: ContextType ) => {
       
       // Fetch users by tenant scope
       const condition: any = { $or }
-      if( ['pharmacy', 'hospital'].includes( contextType ) ){
-        const { id } = req.params as JSObject<string>
-        if( !id )
-          return rep.status(400)
-                    .send({
-                      error: true,
-                      status: 'USER::INVALID_REQUEST',
-                      message: `Undefined ${contextType} ID`
-                    })
-
-        condition['account.context.id'] = id
-      }
+      if( ['pharmacy', 'hospital'].includes( contextType ) )
+        condition['account.context.id'] = req.tenant.id
 
       return {
         error: false,
@@ -99,9 +81,15 @@ export default ( contextType: ContextType ) => {
     })
 
     // Update a user details
-    .patch('/:email/:section', { ...Schemas.update, preHandler: [ allow(['SU:', 'PU:ADMIN', 'HU:ADMIN'], contextType ) ] }, async ( req, rep ) => {
-      const { email } = req.params as JSObject<any>
-      if( !(await Users.findOne({ 'profile.email': email })) )
+    .patch('/:email/:section', Schemas.update, async ( req, rep ) => {
+      const 
+      { email } = req.params as JSObject<any>,
+      condition: any = { 'profile.email': email }
+
+      if( ['pharmacy', 'hospital'].includes( contextType ) )
+        condition['account.context.id'] = req.tenant.id
+
+      if( !(await Users.findOne( condition )) )
         return rep.status(404)
                   .send({
                     error: true,
@@ -137,7 +125,7 @@ export default ( contextType: ContextType ) => {
                     message: 'Invalid Request Arguments'
                   })
       
-      const user = await Users.findOneAndUpdate({ 'profile.email': email }, { $set: updates }, { returnDocument: 'after' }) as User | null
+      const user = await Users.findOneAndUpdate( condition, { $set: updates }, { returnDocument: 'after' }) as User | null
 
       /* -----------------------------------------------------------------------------------------------*/
       // Update user log
@@ -159,10 +147,15 @@ export default ( contextType: ContextType ) => {
     })
 
     // Retreive a user account
-    .get('/:email', { ...Schemas.retrieve, preHandler: [ allow(['SU:', 'PU:ADMIN', 'HU:ADMIN'], contextType ) ] }, async ( req, rep ) => {
+    .get('/:email', Schemas.retrieve, async ( req, rep ) => {
       const 
       { email } = req.params as JSObject<any>,
-      user = await Users.findOne({ 'profile.email': email }) as User | null
+      condition: any = { 'profile.email': email }
+      
+      if( ['pharmacy', 'hospital'].includes( contextType ) )
+        condition['account.context.id'] = req.tenant.id
+
+      const user = await Users.findOne( condition ) as User | null
       if( !user )
         return rep.status(404)
                   .send({
@@ -179,10 +172,15 @@ export default ( contextType: ContextType ) => {
     })
 
     // Delete a user account
-    .delete('/:email', { ...Schemas.remove, preHandler: [ allow(['SU:', 'PU:ADMIN', 'HU:ADMIN'], contextType ) ] }, async ( req, rep ) => {
-      const
+    .delete('/:email', Schemas.remove, async ( req, rep ) => {
+      const 
       { email } = req.params as JSObject<any>,
-      { deletedCount } = await Users.deleteOne({ 'profile.email': email })
+      condition: any = { 'profile.email': email }
+      
+      if( ['pharmacy', 'hospital'].includes( contextType ) )
+        condition['account.context.id'] = req.tenant.id
+
+      const { deletedCount } = await Users.deleteOne( condition )
       if( !deletedCount )
         return rep.status(404)
                   .send({

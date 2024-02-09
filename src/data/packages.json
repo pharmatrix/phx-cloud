@@ -1,0 +1,170 @@
+[
+  {
+    "type": "basic",
+    "price": 99,
+    "per": "month",
+    "services": [
+      {
+        "attr": "PRESCRIPTION_DB",
+        "label": "Prescription Database",
+        "value": true
+      },
+      {
+        "attr": "DEVICES",
+        "label": "2 Installation Devices",
+        "value": 2
+      },
+      {
+        "attr": "TEMPLATES",
+        "label": "2 Printing Templates",
+        "value": 2
+      },
+      {
+        "attr": "PRINTERS",
+        "label": "Supported Printers",
+        "value": "supported"
+      },
+      {
+        "attr": "INVENTORY",
+        "label": "Products Inventory",
+        "value": true
+      },
+      {
+        "attr": "BACKUP",
+        "label": "Data Security & Backup",
+        "value": true
+      }
+    ]
+  },
+  {
+    "type": "medium",
+    "price": 299,
+    "per": "month",
+    "services": [
+      {
+        "attr": "PRESCRIPTION_DB",
+        "label": "Prescription Database",
+        "value": true
+      },
+      {
+        "attr": "DEVICES",
+        "label": "Installation Devices",
+        "value": 10
+      },
+      {
+        "attr": "TEMPLATES",
+        "label": "Printing Templates",
+        "value": 5
+      },
+      {
+        "attr": "PRINTERS",
+        "label": "Supported Printers",
+        "value": "supported"
+      },
+      {
+        "attr": "INVENTORY",
+        "label": "Products Inventory",
+        "value": true
+      },
+      {
+        "attr": "BACKUP",
+        "label": "Data Security & Backup",
+        "value": true
+      }
+    ]
+  },
+  {
+    "type": "enterprise",
+    "price": 499,
+    "per": "month",
+    "services": [
+      {
+        "attr": "PRESCRIPTION_DB",
+        "label": "Prescription Database",
+        "value": true
+      },
+      {
+        "attr": "DEVICES",
+        "label": "Installation Devices",
+        "value": 60
+      },
+      {
+        "attr": "TEMPLATES",
+        "label": "Printing Templates",
+        "value": "unlimited"
+      },
+      {
+        "attr": "PRINTERS",
+        "label": "Supported Printers",
+        "value": "supported"
+      },
+      {
+        "attr": "INVENTORY",
+        "label": "Products Inventory",
+        "value": true
+      },
+      {
+        "attr": "ANALYTICS",
+        "label": "Analytics & Sales Insights",
+        "value": true
+      },
+      {
+        "attr": "BACKUP",
+        "label": "Data Security & Backup",
+        "value": true
+      },
+      {
+        "attr": "SUPPORT",
+        "label": "Fulltime support",
+        "value": true
+      }
+    ]
+  },
+  {
+    "type": "custom",
+    "price": null,
+    "per": null,
+    "services": [
+      {
+        "attr": "PRESCRIPTION_DB",
+        "label": "Prescription Database",
+        "value": true
+      },
+      {
+        "attr": "DEVICES",
+        "label": "Installation Devices",
+        "value": "Unlimited"
+      },
+      {
+        "attr": "TEMPLATES",
+        "label": "Printing Templates",
+        "value": "unlimited"
+      },
+      {
+        "attr": "PRINTERS",
+        "label": "Supported Printers",
+        "value": "supported"
+      },
+      {
+        "attr": "INVENTORY",
+        "label": "Products Inventory",
+        "value": true
+      },
+      {
+        "attr": "ANALYTICS",
+        "label": "Analytics & Sales Insights",
+        "value": true
+      },
+      {
+        "attr": "BACKUP",
+        "label": "Data Security & Backup",
+        "value": true
+      },
+      {
+        "attr": "SUPPORT",
+        "label": "Fulltime support",
+        "value": true
+      }
+    ]
+  }
+]

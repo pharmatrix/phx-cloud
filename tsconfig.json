@@ -17,6 +17,7 @@
     "paths": {
       "#routes/*": ["routes/*"],
       "#types/*": ["types/*"],
+      "#data/*": ["data/*"],
       "#lib/*": ["lib/*"]
     }
   },

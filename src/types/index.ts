@@ -53,3 +53,23 @@ export type Printer = {
   }
   added: ActionRecord
 }
+
+export type PackageService = {
+  attr: string
+  label: string
+  value: string | boolean
+}
+export type PackagePer = 'month' | 'quarterly' | 'year'
+export type Package = {
+  type: string
+  per: PackagePer
+  services: PackageService[]
+}
+
+export type PaymentTransaction = {
+  portal: string
+  method: string
+  amount: number
+  currency: string
+  transactionId: string
+}

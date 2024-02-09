@@ -50,11 +50,10 @@ export default ( contextType: ContextType ) => {
                     message: 'This user account already bear this role'
                   })
       
-      const { cid } = req.body as JSObject<any>
       let context: Context = { type: contextType, role }
       switch( contextType ){
         case 'pharmacy': {
-          const pharmacy = await Tenants.findOne({ type: 'pharmacy', id: cid }) as Tenant | null
+          const pharmacy = await Tenants.findOne({ type: 'pharmacy', id: req.user.account.context.id }) as Tenant | null
           if( !pharmacy )
             return rep.code(401)
                       .send({
@@ -81,11 +80,11 @@ export default ( contextType: ContextType ) => {
                         message: 'Unauthorized invitation role'
                       })
 
-          context.id = cid
+          context.id = req.user.account.context.id
         } break
 
         case 'hospital': {
-          const hospital = await Tenants.findOne({ type: 'hospital', id: cid }) as Tenant | null
+          const hospital = await Tenants.findOne({ type: 'hospital', id: req.user.account.context.id }) as Tenant | null
           if( !hospital )
             return rep.code(401)
                       .send({
@@ -112,7 +111,7 @@ export default ( contextType: ContextType ) => {
                         message: 'Unauthorized invitation role'
                       })
 
-          context.id = cid
+          context.id = req.user.account.context.id
         } break
         
         default: {
@@ -124,6 +123,24 @@ export default ( contextType: ContextType ) => {
                         status: 'INVITATION::INVALID_REQUEST',
                         message: 'Unauthorized invitation role'
                       })
+
+          /**
+           * In case user is directly invited to join a
+           * tenant by a Super-Admin
+           */
+          const { tenantId } = req.body as JSObject<any>
+          if( tenantId ){
+            // Tenant must exists
+            if( !(await Tenants.findOne({ id: tenantId })) )
+              return rep.code(400)
+                        .send({
+                          error: true,
+                          status: 'INVITATION::INVALID_REQUEST',
+                          message: 'Tenant Not Found'
+                        })
+
+            context.id = tenantId
+          }
         }
       }
       
@@ -213,13 +230,15 @@ export default ( contextType: ContextType ) => {
           account: {
             context,
             PIN: String( random(1000, 9999) ), // Default PIN
-            notification: {
-              push: rtoken.generate(48) as string, // Push notification token
-              email: true
+            settings: {
+              notification: {
+                push: rtoken.generate(48) as string, // Push notification token
+                email: true
+              }
             }
           },
           connection: {
-            restrictred: {
+            restricted: {
               action: 'COMPLETE-SIGNUP',
               message: 'Must complete sign-up'
             }

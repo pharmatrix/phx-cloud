@@ -270,7 +270,7 @@ export default async ( App: FastifyInstance ) => {
                   message: 'User Account Not Found',
                   next: 'signup'
                 })
-
+    
     // Check whether user account is restricted for some reason
     if( user.connection.restricted )
       return rep.code(401)

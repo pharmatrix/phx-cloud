@@ -105,6 +105,19 @@ export default plugin( ( App: FastifyInstance, opts: RouteShorthandOptions, done
     },
     additionalProperties: false
   })
+  .addSchema({
+    $id: 'PaymentTransaction',
+    type: 'object',
+    properties: {
+      source: _StringType,
+      method: _StringType,
+      amount: _NumberType,
+      currency: _StringType,
+      transactionId: _StringType
+    },
+    required: ['source', 'method', 'amount', 'currency', 'transactionId'],
+    additionalProperties: false
+  })
 
   // User validation schema references
   .addSchema({
@@ -293,6 +306,30 @@ export default plugin( ( App: FastifyInstance, opts: RouteShorthandOptions, done
         additionalProperties: false
       }
     },
+    additionalProperties: false
+  })
+
+  // Subscription data validation schema reference
+  .addSchema({
+    $id: 'Subscription',
+    type: 'object',
+    properties: {
+      tenantId: { type: 'string' },
+      reference: { type: 'string' },
+      ptype: { type: 'string' },
+      per: { type: 'string' },
+      duration: {
+        type: 'object',
+        properties: {
+          start: { type: 'number' },
+          end: { type: 'number' }
+        }
+      },
+      status: { type: 'string' },
+      payment: { $ref: 'PaymentTransaction#' },
+      subscribed: ActionRecord
+    },
+    required: ['tenantId', 'reference', 'ptype', 'per', 'duration', 'status', 'payment'],
     additionalProperties: false
   })
   

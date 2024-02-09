@@ -9,7 +9,7 @@ export const invite: RouteShorthandOptions = {
         name: { type: 'string' },
         email: { type: 'string' },
         role: { type: 'string' },
-        cid: { type: 'string' }
+        tenantId: { type: 'string' }
       },
       required: ['name', 'email', 'role']
     },

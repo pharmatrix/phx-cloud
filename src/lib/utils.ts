@@ -1,7 +1,7 @@
 
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import type { User } from '#types/user'
-import type { ContextType, JSObject } from '#types/index'
+import type { ContextType, JSObject, PackagePer } from '#types/index'
 import type { Tenant, TenantType } from '#types/tenant'
 
 import * as bcrypt from 'bcryptjs'
@@ -69,6 +69,21 @@ export const getDeviceId = () => {
   return 'DVC-'+ id
 }
 
+export const getDurationRange = ( per: PackagePer, duration: number, from: number ) => {
+  // Duration in timestamp range
+  let seconds
+  switch( per ){
+    case 'year': seconds = 1000 * 3600 * 24 * 365; break
+    case 'month':
+    default: seconds = 1000 * 3600 * 24 * 30; // Default per month
+  }
+
+  return {
+    start: from,
+    end: from + ( seconds * Number( duration ) )
+  }
+}
+
 export const hashPassword = ( plain: string, hashed?: string ): Promise<string|boolean> => {
   return new Promise( ( resolve, reject ) => {
     !hashed ?
@@ -128,6 +143,16 @@ export const isConnected = ( App: FastifyInstance ) => {
                   next: 'signin'
                 })
 
+    // Check whether user account is restricted for some reason
+    if( user.connection.restricted )
+      return rep.code(401)
+                .send({
+                  error: true,
+                  status: 'AUTH::INVALID_REQUEST',
+                  message: `User Account Restricted: ${user.connection.restricted.message}`,
+                  next: 'verify'
+                })
+
     req.user = user
     req.email = user.profile.email
   }
@@ -145,7 +170,7 @@ export const isTenant = ( App: FastifyInstance ) => {
                 .send({
                   error: true,
                   status: 'TENANT::UNAUTHRORIZED',
-                  message: 'Not Authorized Access'
+                  message: 'Tenant Not Found'
                 })
     
     req.tenant = tenant

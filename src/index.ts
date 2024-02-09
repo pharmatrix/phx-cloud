@@ -13,8 +13,10 @@ import Security_v1 from '#routes/v1/security'
 import Printers_v1 from '#routes/v1/printers'
 import Utilities_v1 from '#routes/v1/utilities'
 import Invitations_v1 from '#routes/v1/invitations'
-import GlobalSchemas_v1 from './routes/v1/gschemas'
-import Purge from './data/purge'
+import Subscriptions_v1 from '#routes/v1/subscriptions'
+import GlobalSchemas_v1 from '#routes/v1/gschemas'
+import { SubscriptionWorker } from '#lib/workers'
+import Purge from '#data/purge'
 
 export default async ( http: ServerPlugin<HttpServer>, database: MongodbPugin, io: SocketIOServer ) => {
   if( !http.app ) 
@@ -23,6 +25,9 @@ export default async ( http: ServerPlugin<HttpServer>, database: MongodbPugin, i
   // Purge the database with static data
   const db = database.getConnection()
   await Purge( db )
+
+  // Start service workers
+  SubscriptionWorker( db )
 
   // Initialize applications
   http.app
@@ -42,22 +47,23 @@ export default async ( http: ServerPlugin<HttpServer>, database: MongodbPugin, i
 
   .router('/super/v1/invitations', Invitations_v1('super') )
   .router('/pharmacy/v1/invitations', Invitations_v1('pharmacy') )
-  .router('/hospital/v1/invitations', Invitations_v1('hospital') )
 
   .router('/pharmacy/v1', Tenants_v1('pharmacy') )
-  .router('/hospital/v1', Tenants_v1('hospital') )
   .router('/super/v1/tenants', Tenants_v1('super') )
 
   .router('/super/v1/users', Users_v1('super') )
-  .router('/pharmacy/v1/:id/users', Users_v1('pharmacy') )
-  .router('/hospital/v1/:id/users', Users_v1('hospital') )
+  .router('/pharmacy/v1/users', Users_v1('pharmacy') )
+
+  .router('/super/v1/subscriptions', Subscriptions_v1('super') )
+  .router('/super/v1/tenants/:id/subscriptions', Subscriptions_v1('super') )
+  .router('/pharmacy/v1/subscriptions', Subscriptions_v1('pharmacy') )
   
-  .router('/pharmacy/v1/:id/branches', Branches_v1('pharmacy') )
+  .router('/pharmacy/v1/branches', Branches_v1('pharmacy') )
   .router('/super/v1/tenants/:id/branches', Branches_v1('super') )
   
-  .router('/pharmacy/v1/:id/devices', Devices_v1('pharmacy') )
+  .router('/pharmacy/v1/devices', Devices_v1('pharmacy') )
   .router('/super/v1/tenants/:id/devices', Devices_v1('super') )
-  .router('/pharmacy/v1/:id/branches/:branchId/devices', Devices_v1('pharmacy') )
+  .router('/pharmacy/v1/branches/:branchId/devices', Devices_v1('pharmacy') )
   .router('/super/v1/tenants/:id/branches/:branchId/devices', Devices_v1('super') )
 
   // Handle application exception errors

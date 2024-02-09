@@ -1,4 +1,4 @@
-import { ActionRecord, Contacts, Location } from '.'
+import { ActionRecord, Contacts, Location, PackagePer, PaymentTransaction } from '.'
 
 export type TenantType = 'pharmacy' | 'hospital'
 export type Tenant = {
@@ -41,4 +41,18 @@ export type Branch = {
   location: Location
   contacts: Contacts
   created: ActionRecord
+}
+
+export type Subscription = {
+  reference: string
+  tenantId: string
+  ptype: string
+  per: PackagePer
+  duration: {
+    start: number
+    end: number
+  }
+  status: 'PENDING' | 'ACTIVE' | 'SUSPENDED' | 'CANCELLED' | 'EXPIRED'
+  payment: PaymentTransaction
+  subscribed: ActionRecord
 }
