@@ -111,6 +111,64 @@ export default async ( App: FastifyInstance ) => {
     }
   } )
 
+  // Upload printer driver
+  .patch('/:query/driver/upload', Schemas.upload, async ( req, rep ) => {
+    if( !req.isMultipart() )
+      return rep.code(400)
+                .send({
+                  error: true,
+                  message: 'Request is not multipart'
+                })
+
+    const
+    { query } = req.params as JSObject<any>,
+    condition = { $or: [{ name: query }, { model: query }] }
+
+    let printer = await Printers.findOne( condition ) as Printer | null
+    if( !printer )
+      return rep.status(404)
+                .send({
+                  error: true,
+                  status: 'PRINTER::INVALID_REQUEST',
+                  message: `Printer Not Found`
+                })
+
+    const
+    data = await req.file(),
+    filepath = `${process.env.APPNAME}/drivers/${data.filename}`
+    
+    // Store files on cloud space storage
+    await req.pumpStream( data.file, await App.storage().stream.to( filepath ) )
+
+    const 
+    Now = Date.now(),
+    driver = {
+      url: `${process.env.ADDRESS}/downloads/v1/drivers/${printer.model}`,
+      canonical: `${process.env.STORAGE_BASE_URL}/${filepath}`,
+      date: Now
+    }
+
+    printer = await Printers.findOneAndUpdate( condition, { $set: { driver } }, { returnDocument: 'after' }) as Printer | null
+
+    /* -----------------------------------------------------------------------------------------------*/
+    // Upload new printer driver log
+    const alog: ActivityLog = {
+      action: 'UPLOAD-PRINTER-DRIVER',
+      uid: req.email,
+      context: req.user.account.context,
+      data: { query, driver },
+      datetime: Now
+    }
+    await Logs.insertOne( alog )
+    
+    return {
+      error: false,
+      status: 'PRINTER::UPLOADED',
+      message: 'Printer driver uploaded',
+      printer
+    }
+  })
+
   // Update printer details
   .patch('/:query', Schemas.update, async ( req, rep ) => {
     const

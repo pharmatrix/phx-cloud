@@ -18,7 +18,7 @@ autowire: true
 
 # Additional configurations
 __extends__: [
-  # 'assets',
+  'assets',
   'servers',
   # 'sessions',
   'security',

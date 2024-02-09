@@ -42,11 +42,14 @@ export type Printer = {
   enabled: boolean
   name: String
   model: string
-  driverURL: string
   specs: {
     paperSize: string
     injection: boolean
     color: boolean
+  }
+  driver?: {
+    url: string
+    canonical: string
   }
   added: ActionRecord
 }

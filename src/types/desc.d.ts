@@ -8,6 +8,7 @@ declare module 'fastify' {
     storage: any
   }
   interface FastifyRequest {
+    files: any
     user: User
     tenant: Tenant
     email: string

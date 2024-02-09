@@ -249,7 +249,6 @@ export default plugin( ( App: FastifyInstance, opts: RouteShorthandOptions, done
       enabled: _BooleanType,
       name: _StringType,
       model: _StringType,
-      driverURL: _StringType,
       specs: {
         type: 'object',
         properties: {
@@ -258,9 +257,16 @@ export default plugin( ( App: FastifyInstance, opts: RouteShorthandOptions, done
           injection: _StringType
         }
       },
+      driver: {
+        type: 'object',
+        properties: {
+          url: _StringType,
+          // canonical: _StringType
+        }
+      },
       added: ActionRecord
     },
-    required: ['enabled', 'name', 'model', 'driverURL', 'specs'],
+    required: ['enabled', 'name', 'model', 'specs'],
     additionalProperties: false
   })
   .addSchema({
@@ -270,7 +276,6 @@ export default plugin( ( App: FastifyInstance, opts: RouteShorthandOptions, done
       enabled: _BooleanType,
       name: _StringType,
       model: _StringType,
-      driverURL: _StringType,
       specs: {
         type: 'object',
         properties: {
@@ -278,6 +283,14 @@ export default plugin( ( App: FastifyInstance, opts: RouteShorthandOptions, done
           paperSize: _StringType,
           injection: _StringType
         }
+      },
+      driver: {
+        type: 'object',
+        properties: {
+          url: _StringType,
+          // canonical: _StringType
+        },
+        additionalProperties: false
       }
     },
     additionalProperties: false

@@ -64,6 +64,29 @@ export const update: RouteShorthandOptions = {
   }
 }
 
+export const upload: RouteShorthandOptions = {
+  schema: {
+    params: {
+      type: 'object',
+      properties: {
+        query: { type: 'string' }
+      }
+    },
+    response: {
+      200: {
+        type: 'object',
+        properties: {
+          error: { type: 'boolean' },
+          status: { type: 'string' },
+          message: { type: 'string' },
+          printer: { $ref: 'Printer#' }
+        }
+      },
+      '4xx': { $ref: 'RequestErrorSchema#' }
+    }
+  }
+}
+
 export const fetch: RouteShorthandOptions = {
   schema: {
     querystring: {
@@ -151,6 +174,7 @@ export default {
   retrieve,
   fetch,
   search,
+  upload,
   update,
   remove
 }
