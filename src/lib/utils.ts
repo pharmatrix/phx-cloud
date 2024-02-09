@@ -168,6 +168,10 @@ export const allow = ( roles: string[], contextType?: ContextType ) => {
       status: 'USER::UNAUTHRORIZED',
       message: 'Access Denied'
     }
+
+    // Non-active user with no account context
+    if( !req.user.account.context.role )
+      return rep.status(401).send( errmess )
     
     if( !roles.includes( req.user.account.context.role )
         && !roles.includes( req.user.account.context.role.substring(0, 3) ) )

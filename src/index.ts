@@ -4,6 +4,8 @@ import type SocketIOServer from '@ckenx/kenx-socketio'
 import type { ServerPlugin } from '@ckenx/node/types/index'
 
 import Auth_v1 from '#routes/v1/auth'
+import Users_v1 from '#routes/v1/users'
+import Account_v1 from '#routes/v1/account'
 import Tenants_v1 from '#routes/v1/tenants'
 import Devices_v1 from '#routes/v1/devices'
 import Branches_v1 from '#routes/v1/branches'
@@ -33,23 +35,28 @@ export default async ( http: ServerPlugin<HttpServer>, database: MongodbPugin, i
   // Register routes
   .router('/', Utilities_v1 )
   .router('/auth/v1', Auth_v1 )
+  .router('/account/v1', Account_v1 )
   .router('/security/v1', Security_v1 )
 
   .router('/super/v1/invitations', Invitations_v1('super') )
   .router('/pharmacy/v1/invitations', Invitations_v1('pharmacy') )
   .router('/hospital/v1/invitations', Invitations_v1('hospital') )
 
+  .router('/pharmacy/v1', Tenants_v1('pharmacy') )
+  .router('/hospital/v1', Tenants_v1('hospital') )
   .router('/super/v1/tenants', Tenants_v1('super') )
-  .router('/pharmacy/v1/tenants', Tenants_v1('pharmacy') )
-  .router('/hospital/v1/tenants', Tenants_v1('hospital') )
 
-  .router('/super/v1/tenants/:id/branches', Branches_v1('super') )
-  .router('/pharmacy/v1/tenants/:id/branches', Branches_v1('pharmacy') )
+  .router('/super/v1/users', Users_v1('super') )
+  .router('/pharmacy/v1/:id/users', Users_v1('pharmacy') )
+  .router('/hospital/v1/:id/users', Users_v1('hospital') )
   
+  .router('/pharmacy/v1/:id/branches', Branches_v1('pharmacy') )
+  .router('/super/v1/tenants/:id/branches', Branches_v1('super') )
+  
+  .router('/pharmacy/v1/:id/devices', Devices_v1('pharmacy') )
   .router('/super/v1/tenants/:id/devices', Devices_v1('super') )
-  .router('/pharmacy/v1/tenants/:id/devices', Devices_v1('pharmacy') )
+  .router('/pharmacy/v1/:id/branches/:branchId/devices', Devices_v1('pharmacy') )
   .router('/super/v1/tenants/:id/branches/:branchId/devices', Devices_v1('super') )
-  .router('/pharmacy/v1/tenants/:id/branches/:branchId/devices', Devices_v1('pharmacy') )
 
   // Handle application exception errors
   .on('error', async ( error: Error, req, res ) => {

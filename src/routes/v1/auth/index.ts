@@ -86,9 +86,11 @@ export default async ( App: FastifyInstance ) => {
       account: {
         context,
         PIN: String( random(1000, 9999) ), // Default PIN
-        notification: {
-          push: rtoken.generate(48) as string, // Push notification token
-          email: true
+        settings: {
+          notification: {
+            push: rtoken.generate(48) as string, // Push notification token
+            email: true
+          }
         }
       },
       connection: {

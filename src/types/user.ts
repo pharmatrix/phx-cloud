@@ -11,13 +11,16 @@ export type UserProfile = {
   avatar: string
   location?: Location
 }
-export type UserAccount = {
-  PIN: string
-  context: Context
+export type UserSettings = {
   notification: {
     push?: string
     email: boolean
   }
+}
+export type UserAccount = {
+  PIN: string
+  context: Context
+  settings: UserSettings
 }
 export type UserConnection = {
   token?: string

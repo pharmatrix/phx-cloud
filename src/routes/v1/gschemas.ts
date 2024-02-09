@@ -136,31 +136,49 @@ export default plugin( ( App: FastifyInstance, opts: RouteShorthandOptions, done
       firstname: _StringType,
       lastname: _StringType,
       email: _StringType,
-      password: _StringType,
+      // password: _StringType,
       dob: _StringType,
       gender: _StringType,
       avatar: _StringType,
       location: { $ref: 'Location#' }
     },
-    required: ['firstname', 'lastname', 'email', 'avatar', 'location'],
+    // required: ['firstname', 'lastname', 'email', 'avatar', 'location'],
     additionalProperties: false
+  })
+  .addSchema({
+    $id: 'UserSettings',
+    type: 'object',
+    properties: {
+      theme: {
+        type: 'object',
+        properties: {
+          mode: _StringType,
+          fontSize: _StringType
+        },
+        additionalProperties: false
+      },
+      notification: {
+        type: 'object',
+        properties: {
+          // push: _StringType,
+          email: _BooleanType
+        },
+        additionalProperties: false
+      }
+    },
+    // required: ['notification'],
+    // additionalProperties: false
   })
   .addSchema({
     $id: 'UserAccount',
     type: 'object',
     properties: {
       context: { $ref: 'UserContext#' },
-      PIN: _StringType,
-      notification: {
-        type: 'object',
-        properties: {
-          push: _StringType,
-          email: _BooleanType
-        },
-        additionalProperties: false
-      }
+      // PIN: _StringType,
+      flag: _StringType,
+      settings: { $ref: 'UserSettings#' }
     },
-    required: ['context', 'notification'],
+    required: ['context', 'settings'],
   })
   .addSchema({
     $id: 'User',
@@ -217,13 +235,9 @@ export default plugin( ( App: FastifyInstance, opts: RouteShorthandOptions, done
       name: _StringType,
       contacts: { $ref: 'Contacts#' },
       location: { $ref: 'Location#' },
-      devices: {
-        type: 'array',
-        items: { $ref: 'Device#' }
-      },
       created: ActionRecord
     },
-    required: ['id', 'tenantId', 'name', 'contacts', 'location', 'devices', 'created'],
+    required: ['id', 'tenantId', 'name', 'contacts', 'location', 'created'],
     additionalProperties: false
   })
   

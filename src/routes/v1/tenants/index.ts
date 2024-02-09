@@ -272,8 +272,12 @@ export default ( contextType: ContextType ) => {
 
       // Delete all branches attached to this tenant account
       await Branches.deleteMany({ tenantId: id })
-      // Detach all users attached to this tenant account
-      await Users.updateMany({ 'account.context.id': id }, { $set: { 'account.context': {} } })
+      /**
+       * Detach all users attached to this tenant 
+       * account except tenant's admins, so that they
+       * have possibility to recreate a new tenant.
+       */
+      await Users.updateMany({ 'account.context.id': id, 'account.context.role': { $nin: ['PU:ADMIN', 'HU:ADMIN'] } }, { $set: { 'account.context': {} } })
 
       /* -----------------------------------------------------------------------------------------------*/
       // New invitation log
