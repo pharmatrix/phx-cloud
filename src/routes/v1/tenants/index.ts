@@ -146,7 +146,7 @@ export default ( contextType: ContextType ) => {
 
       const
       // Fetch only item no assign to any tag
-      results = await Tenants.find( condition ).limit( limit ).sort({ 'registered.at': -1 }).toArray(),
+      results = await Tenants.find( condition ).limit( limit ).sort({ 'registered.at': -1 }).toArray() as unknown as Tenant[],
       response: any = {
         error: false,
         status: 'TENANT::FETCHED',
@@ -179,7 +179,7 @@ export default ( contextType: ContextType ) => {
       return {
         error: false,
         status: 'TENANT::SEARCH',
-        results: await Tenants.find({ $or }).sort({ 'registered.at': -1 }).toArray()
+        results: await Tenants.find({ $or }).sort({ 'registered.at': -1 }).toArray() as unknown as Tenant[]
       }
     } )
 
@@ -208,11 +208,11 @@ export default ( contextType: ContextType ) => {
         return rep.code(400)
                   .send({
                     error: true,
-                    status: 'USER::INVALID_REQUEST',
+                    status: 'TENANT::INVALID_REQUEST',
                     message: 'Invalid Request Arguments'
                   })
       
-      const tenant = await Tenants.findOneAndUpdate({ id }, { $set: updates }, { returnDocument: 'after' })
+      const tenant = await Tenants.findOneAndUpdate({ id }, { $set: updates }, { returnDocument: 'after' }) as Tenant | null
 
       /* -----------------------------------------------------------------------------------------------*/
       // New invitation log
@@ -239,7 +239,7 @@ export default ( contextType: ContextType ) => {
       // Refer to current's user context ID
       if( id === 'me' ) id = req.user.account.context.id
 
-      const tenant = await Tenants.findOne({ id })
+      const tenant = await Tenants.findOne({ id }) as Tenant | null
       if( !tenant )
         return rep.status(404)
                   .send({

@@ -37,3 +37,16 @@ export type Invitation = {
   expiry: number
   added: ActionRecord
 }
+
+export type Printer = {
+  enabled: boolean
+  name: String
+  model: string
+  driverURL: string
+  specs: {
+    paperSize: string
+    injection: boolean
+    color: boolean
+  }
+  added: ActionRecord
+}

@@ -10,6 +10,7 @@ import Tenants_v1 from '#routes/v1/tenants'
 import Devices_v1 from '#routes/v1/devices'
 import Branches_v1 from '#routes/v1/branches'
 import Security_v1 from '#routes/v1/security'
+import Printers_v1 from '#routes/v1/printers'
 import Utilities_v1 from '#routes/v1/utilities'
 import Invitations_v1 from '#routes/v1/invitations'
 import GlobalSchemas_v1 from './routes/v1/gschemas'
@@ -37,6 +38,7 @@ export default async ( http: ServerPlugin<HttpServer>, database: MongodbPugin, i
   .router('/auth/v1', Auth_v1 )
   .router('/account/v1', Account_v1 )
   .router('/security/v1', Security_v1 )
+  .router('/printers/v1', Printers_v1 )
 
   .router('/super/v1/invitations', Invitations_v1('super') )
   .router('/pharmacy/v1/invitations', Invitations_v1('pharmacy') )

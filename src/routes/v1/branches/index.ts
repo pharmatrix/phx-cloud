@@ -75,7 +75,7 @@ export default ( contextType: ContextType ) => {
 
       const
       // Fetch only item no assign to any tag
-      results = await Branches.find( condition ).limit( limit ).sort({ 'created.at': -1 }).toArray(),
+      results = await Branches.find( condition ).limit( limit ).sort({ 'created.at': -1 }).toArray() as unknown as Branch[],
       response: any = {
         error: false,
         status: 'BRANCH::FETCHED',
@@ -107,7 +107,7 @@ export default ( contextType: ContextType ) => {
       return {
         error: false,
         status: 'BRANCH::SEARCH',
-        results: await Branches.find({ tenantId: req.tenant.id, $or }).sort({ 'created.at': -1 }).toArray()
+        results: await Branches.find({ tenantId: req.tenant.id, $or }).sort({ 'created.at': -1 }).toArray() as unknown as Branch[]
       }
     } )
 
@@ -135,11 +135,11 @@ export default ( contextType: ContextType ) => {
         return rep.code(400)
                   .send({
                     error: true,
-                    status: 'USER::INVALID_REQUEST',
+                    status: 'BRANCH::INVALID_REQUEST',
                     message: 'Invalid Request Arguments'
                   })
       
-      const branch = await Branches.findOneAndUpdate( condition, { $set: updates }, { returnDocument: 'after' })
+      const branch = await Branches.findOneAndUpdate( condition, { $set: updates }, { returnDocument: 'after' }) as Branch | null
 
       /* -----------------------------------------------------------------------------------------------*/
       // Updated branch info log
@@ -165,7 +165,7 @@ export default ( contextType: ContextType ) => {
       const 
       { branchId } = req.params as JSObject<any>,
       condition = { id: branchId, tenantId: req.tenant.id },
-      branch = await Branches.findOne( condition )
+      branch = await Branches.findOne( condition ) as Branch | null
       if( !branch )
         return rep.status(404)
                   .send({

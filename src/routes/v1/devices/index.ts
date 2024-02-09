@@ -157,7 +157,7 @@ export default ( contextType: ContextType ) => {
 
       const
       // Fetch only item no assign to any tag
-      results = await Devices.find( condition ).limit( limit ).sort({ 'added.at': -1 }).toArray(),
+      results = await Devices.find( condition ).limit( limit ).sort({ 'added.at': -1 }).toArray() as unknown as Device[],
       response: any = {
         error: false,
         status: 'DEVICE::FETCHED',
@@ -198,7 +198,7 @@ export default ( contextType: ContextType ) => {
       return {
         error: false,
         status: 'DEVICE::SEARCH',
-        results: await Devices.find( condition ).sort({ 'added.at': -1 }).toArray()
+        results: await Devices.find( condition ).sort({ 'added.at': -1 }).toArray() as unknown as Device[]
       }
     } )
     // Update device details
@@ -228,14 +228,14 @@ export default ( contextType: ContextType ) => {
         return rep.code(400)
                   .send({
                     error: true,
-                    status: 'USER::INVALID_REQUEST',
+                    status: 'TENANT::INVALID_REQUEST',
                     message: 'Invalid Request Arguments'
                   })
         
       // Record the last connection IP address
       updates.lastIP = req.ip
       
-      const device = await Devices.findOneAndUpdate( condition, { $set: updates }, { returnDocument: 'after' })
+      const device = await Devices.findOneAndUpdate( condition, { $set: updates }, { returnDocument: 'after' }) as Device | null
 
       /* -----------------------------------------------------------------------------------------------*/
       // Updated device info log
@@ -263,7 +263,7 @@ export default ( contextType: ContextType ) => {
       if( branchId )
         condition.branchId = branchId
 
-      const device = await Devices.findOne( condition )
+      const device = await Devices.findOne( condition ) as Device | null
       if( !device )
         return rep.status(404)
                   .send({

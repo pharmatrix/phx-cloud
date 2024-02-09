@@ -241,5 +241,47 @@ export default plugin( ( App: FastifyInstance, opts: RouteShorthandOptions, done
     additionalProperties: false
   })
   
+  // Printer data validation schema reference
+  .addSchema({
+    $id: 'Printer',
+    type: 'object',
+    properties: {
+      enabled: _BooleanType,
+      name: _StringType,
+      model: _StringType,
+      driverURL: _StringType,
+      specs: {
+        type: 'object',
+        properties: {
+          color: _BooleanType,
+          paperSize: _StringType,
+          injection: _StringType
+        }
+      },
+      added: ActionRecord
+    },
+    required: ['enabled', 'name', 'model', 'driverURL', 'specs'],
+    additionalProperties: false
+  })
+  .addSchema({
+    $id: 'UpdatePrinter',
+    type: 'object',
+    properties: {
+      enabled: _BooleanType,
+      name: _StringType,
+      model: _StringType,
+      driverURL: _StringType,
+      specs: {
+        type: 'object',
+        properties: {
+          color: _BooleanType,
+          paperSize: _StringType,
+          injection: _StringType
+        }
+      }
+    },
+    additionalProperties: false
+  })
+  
   done()
 } )
