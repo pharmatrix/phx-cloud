@@ -19,34 +19,30 @@ export default ( contextType: ContextType ) => {
 
     // Fetch users list
     .get('/', Schemas.fetch, async ( req, rep ) => {
-      let { limit } = req.query as JSObject<number>
+      let { limit, page } = req.query as JSObject<number>
+
       limit = Number( limit ) || 50
+      page = Number( page ) || 1
 
       const condition: any = {}
-      
+
       // Fetch users by tenant scope
       if( ['pharmacy', 'hospital'].includes( contextType ) )
         condition['account.context.id'] = req.tenant.id
 
-      // Timestamp of the last item of previous results
-      const { offset } = req.query as JSObject<number>
-      if( offset )
-        condition.datetime = { $lt: Number( offset ) }
-
-      const
       // Fetch only item no assign to any tag
-      results = await Users.find( condition ).limit( limit ).sort({ datetime: -1 }).toArray() as unknown as User[],
-      response: any = {
+      const results = await Users.find( condition )
+                                  .skip( limit * ( page - 1 ) )
+                                  .limit( limit )
+                                  .sort({ datetime: -1 })
+                                  .toArray() as unknown as User[]
+      
+      return {
         error: false,
         status: 'USER::FETCHED',
-        results
+        results,
+        more: results.length == limit
       }
-
-      // Return URL to be call to get more results
-      if( results.length == limit )
-        response.more = `/?offset=${results[ limit - 1 ].datetime}&limit=${limit}`
-
-      return response
     })
 
     // Search a user

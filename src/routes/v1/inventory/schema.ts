@@ -34,7 +34,7 @@ export const fetch: RouteShorthandOptions = {
       type: 'object',
       properties: {
         limit: { type: 'number' },
-        page: { type: 'number' }
+        offset: { type: 'string' }
       },
       additionalProperties: false
     },
@@ -47,8 +47,8 @@ export const fetch: RouteShorthandOptions = {
           invitations: {
             type: 'array',
             items: { $ref: 'Invitation#' }
-          },
-          more: { type: 'boolean' }
+          }
+          
         }
       },
       '4xx': { $ref: 'RequestErrorSchema#' }

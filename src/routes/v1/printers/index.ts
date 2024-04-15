@@ -60,31 +60,25 @@ export default async ( App: FastifyInstance ) => {
 
   // Fetch printers list
   .get('/', Schemas.fetch, async ( req, rep ) => {
-    let { limit } = req.query as JSObject<number>
+    let { limit, page } = req.query as JSObject<number>
+
     limit = Number( limit ) || 50
+    page = Number( page ) || 1
 
     const
     condition: any = {},
-    { offset } = req.query as JSObject<number>
-
-    // Timestamp of the last item of previous results
-    if( offset )
-      condition['added.at'] = { $lt: Number( offset ) }
-
-    const
     // Fetch only item no assign to any tag
-    results = await Printers.find( condition ).limit( limit ).sort({ 'added.at': -1 }).toArray() as unknown as Printer[],
-    response: any = {
+    results = await Printers.find( condition )
+                            .limit( limit )
+                            .sort({ 'added.at': -1 })
+                            .toArray() as unknown as Printer[]
+                            
+    return {
       error: false,
       status: 'PRINTER::FETCHED',
-      results
+      results,
+      more: results.length == limit
     }
-
-    // Return URL to be call to get more results
-    if( results.length == limit )
-      response.more = `/?offset=${results[ limit - 1 ].added.at}&limit=${limit}`
-
-    return response
   } )
 
   // Search printers

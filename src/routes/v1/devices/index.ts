@@ -141,8 +141,10 @@ export default ( contextType: ContextType ) => {
     })
     // Fetch activated devices list
     .get('/', Schemas.fetch, async ( req, rep ) => {
-      let { limit } = req.query as JSObject<number>
+      let { limit, page } = req.query as JSObject<number>
+
       limit = Number( limit ) || 50
+      page = Number( page ) || 1
 
       const
       condition: any = { tenantId: req.tenant.id, activation: { $exists: false } },
@@ -150,25 +152,19 @@ export default ( contextType: ContextType ) => {
       if( branchId )
         condition.branchId = branchId
       
-      // Timestamp of the last item of previous results
-      const { offset } = req.query as JSObject<number>
-      if( offset )
-        condition['added.at'] = { $lt: Number( offset ) }
-
-      const
       // Fetch only item no assign to any tag
-      results = await Devices.find( condition ).limit( limit ).sort({ 'added.at': -1 }).toArray() as unknown as Device[],
-      response: any = {
+      const results = await Devices.find( condition )
+                                    .skip( limit * ( page - 1 ) )
+                                    .limit( limit )
+                                    .sort({ 'added.at': -1 })
+                                    .toArray() as unknown as Device[]
+                              
+      return {
         error: false,
         status: 'DEVICE::FETCHED',
-        results
+        results,
+        more: results.length == limit
       }
-
-      // Return URL to be call to get more results
-      if( results.length == limit )
-        response.more = `/?offset=${results[ limit - 1 ].added.at}&limit=${limit}`
-
-      return response
     } )
     // Search devices
     .get( '/search', Schemas.search, async ( req, res ) => {

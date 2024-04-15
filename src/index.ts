@@ -1,5 +1,5 @@
 import type HttpServer from '@ckenx/kenx-http'
-import type MongodbPugin from '@ckenx/kenx-mongodb'
+import type MongodbPlugin from '@ckenx/kenx-mongodb'
 import type SocketIOServer from '@ckenx/kenx-socketio'
 import type { ServerPlugin } from '@ckenx/node/types/index'
 
@@ -18,7 +18,7 @@ import GlobalSchemas_v1 from '#routes/v1/gschemas'
 import { SubscriptionWorker } from '#lib/workers'
 import Purge from '#data/purge'
 
-export default async ( http: ServerPlugin<HttpServer>, database: MongodbPugin, io: SocketIOServer ) => {
+export default async ( http: ServerPlugin<HttpServer>, database: MongodbPlugin, io: SocketIOServer ) => {
   if( !http.app ) 
     throw new Error('Undefined HTTP Server')
 

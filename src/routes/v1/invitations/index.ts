@@ -178,13 +178,23 @@ export default ( contextType: ContextType ) => {
     })
 
     // Fetch the list of pending invitations
-    .get('/', { ...Schemas.fetch, preHandler: [ isConnected( App ) ] }, async () => {
-      const invitations = await Invitations.find({ 'context.type': contextType }).toArray() as unknown as Invitation[]
+    .get('/', { ...Schemas.fetch, preHandler: [ isConnected( App ) ] }, async ( req ) => {
+      let { limit, page } = req.query as JSObject<number>
+
+      limit = Number( limit ) || 50
+      page = Number( page ) || 1
+
+      const invitations = await Invitations.find({ 'context.type': contextType })
+                                            .skip( limit * ( page - 1 ) )
+                                            .limit( limit )
+                                            .sort({ 'added.at': -1 })
+                                            .toArray() as unknown as Invitation[]
 
       return {
         error: false,
         status: 'INVITATION::FETCHED',
-        invitations
+        invitations,
+        more: invitations.length == limit
       }
     })
 

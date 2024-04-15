@@ -133,31 +133,26 @@ export default ( contextType: ContextType ) => {
 
     // Fetch tenants list
     .get( '/', { ...Schemas.fetch, preHandler: [ allow(['SU:'], contextType ) ] }, async ( req, rep ) => {
-      let { limit } = req.query as JSObject<number>
+      let { limit, page } = req.query as JSObject<number>
+
       limit = Number( limit ) || 50
+      page = Number( page ) || 1
 
       const
       condition: any = {},
-      { offset } = req.query as JSObject<number>
-
-      // Timestamp of the last item of previous results
-      if( offset )
-        condition['registered.at'] = { $lt: Number( offset ) }
-
-      const
       // Fetch only item no assign to any tag
-      results = await Tenants.find( condition ).limit( limit ).sort({ 'registered.at': -1 }).toArray() as unknown as Tenant[],
-      response: any = {
+      results = await Tenants.find( condition )
+                              .skip( limit * ( page - 1 ) )
+                              .limit( limit )
+                              .sort({ 'registered.at': -1 })
+                              .toArray() as unknown as Tenant[]
+                              
+      return {
         error: false,
         status: 'TENANT::FETCHED',
-        results
+        results,
+        more: results.length == limit
       }
-
-      // Return URL to be call to get more results
-      if( results.length == limit )
-        response.more = `/?offset=${results[ limit - 1 ].registered.at}&limit=${limit}`
-
-      return response
     } )
 
     // Search tenant

@@ -81,37 +81,33 @@ export default ( contextType: ContextType ) => {
 
     // Fetch subscriptions
     .get('/', Schemas.fetch, async ( req, rep ) => {
-      let { limit } = req.query as JSObject<number>
+      let { limit, page } = req.query as JSObject<number>
+
       limit = Number( limit ) || 50
+      page = Number( page ) || 1
 
       const condition: any = {}
       if( req.tenant )
         condition.tenantId = req.tenant.id
-
-      // Timestamp of the last item of previous results
-      const { offset } = req.query as JSObject<number>
-      if( offset )
-        condition['subscribed.at'] = { $lt: Number( offset ) }
       
       // Filter by status
       const { status } = req.query as JSObject<number>
       if( status )
         condition.status = status
 
-      const
       // Fetch only item no assign to any tag
-      results = await Subscriptions.find( condition ).limit( limit ).sort({ 'subscribed.at': -1 }).toArray() as unknown as Subscription[],
-      response: any = {
+      const results = await Subscriptions.find( condition )
+                                          .skip( limit * ( page - 1 ) )
+                                          .limit( limit )
+                                          .sort({ 'subscribed.at': -1 })
+                                          .toArray() as unknown as Subscription[]
+
+      return {
         error: false,
         status: 'SUBSCRIPTION::FETCHED',
-        results
+        results,
+        more: results.length == limit
       }
-
-      // Return URL to be call to get more results
-      if( results.length == limit )
-        response.more = `/?offset=${results[ limit - 1 ].subscribed.at}&limit=${limit}`
-
-      return response
     })
     
     // Search subscription

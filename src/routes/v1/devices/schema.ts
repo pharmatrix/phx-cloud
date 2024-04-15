@@ -132,7 +132,7 @@ export const fetch: RouteShorthandOptions = {
       type: 'object',
       properties: {
         limit: { type: 'number' },
-        offset: { type: 'number' },
+        page: { type: 'number' }
       }
     },
     response: {
@@ -144,7 +144,8 @@ export const fetch: RouteShorthandOptions = {
           results: {
             type: 'array',
             items: { $ref: 'Device#' }
-          }
+          },
+          more: { type: 'boolean' }
         }
       },
       '4xx': { $ref: 'RequestErrorSchema#' }

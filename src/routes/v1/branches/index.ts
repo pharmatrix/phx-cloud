@@ -62,31 +62,26 @@ export default ( contextType: ContextType ) => {
 
     // Fetch branches list
     .get('/', Schemas.fetch, async ( req, rep ) => {
-      let { limit } = req.query as JSObject<number>
+      let { limit, page } = req.query as JSObject<number>
+
       limit = Number( limit ) || 50
+      page = Number( page ) || 1
 
       const
       condition: any = { tenantId: req.tenant.id },
-      { offset } = req.query as JSObject<number>
-
-      // Timestamp of the last item of previous results
-      if( offset )
-        condition['created.at'] = { $lt: Number( offset ) }
-
-      const
       // Fetch only item no assign to any tag
-      results = await Branches.find( condition ).limit( limit ).sort({ 'created.at': -1 }).toArray() as unknown as Branch[],
-      response: any = {
+      results = await Branches.find( condition )
+                              .skip( limit * ( page - 1 ) )
+                              .limit( limit )
+                              .sort({ 'created.at': -1 })
+                              .toArray() as unknown as Branch[]
+                              
+      return {
         error: false,
         status: 'BRANCH::FETCHED',
-        results
+        results,
+        more: results.length == limit
       }
-
-      // Return URL to be call to get more results
-      if( results.length == limit )
-        response.more = `/?offset=${results[ limit - 1 ].created.at}&limit=${limit}`
-
-      return response
     } )
 
     // Search branches
